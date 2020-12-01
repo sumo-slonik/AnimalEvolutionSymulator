@@ -41,13 +41,14 @@ public class Controler {
     public void reset()
     {
         world.getChildren().clear();
-        sim = new Simulator(world,100);
+        sim = new Simulator(world,300);
     }
     @FXML
     public void step()
     {
         sim.move();
         sim.draw();
+        sim.SpawnGrass();
     }
 
     @FXML

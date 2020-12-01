@@ -7,9 +7,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Simulator {
     private ArrayList<Animal> animals;
+    private ArrayList<Grass> grass;
+    private Pane world;
     public Simulator(Pane world,int popSize)
     {
+        this.world = world;
         animals = new ArrayList<Animal>();
+        grass = new ArrayList<Grass>();
         for (int i =0;i<popSize;i++)
         {
             int [] DNA = new int[32];
@@ -33,6 +37,10 @@ public class Simulator {
         {
             a.draw();
         }
+        for (Grass g : grass)
+        {
+            g.draw();
+        }
     }
     public void move()
     {
@@ -41,5 +49,10 @@ public class Simulator {
             a.Move();
         }
     }
-
+    public void SpawnGrass()
+    {
+        Vector2d pose = new Vector2d(ThreadLocalRandom.current().nextInt(0, (int)world.getWidth()),ThreadLocalRandom.current().nextInt(0, (int)world.getHeight()));
+        grass.add(new Grass(pose,world));
+        draw();
+    }
 }
