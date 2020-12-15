@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Simulator {
-    private ArrayList<Animal> animals;
-    private ArrayList<Grass> grass;
-    private Pane world;
+    private final ArrayList<Animal> animals;
+    private final ArrayList<Grass> grass;
+    private final Pane world;
     public Simulator(Pane world,int popSize)
     {
         this.world = world;
-        animals = new ArrayList<Animal>();
-        grass = new ArrayList<Grass>();
+        animals = new ArrayList<>();
+        grass = new ArrayList<>();
         for (int i =0;i<popSize;i++)
         {
             int [] DNA = new int[32];
@@ -23,7 +23,7 @@ public class Simulator {
             }
 
             Vector2d pose = new Vector2d(ThreadLocalRandom.current().nextInt(0, (int)world.getWidth()),ThreadLocalRandom.current().nextInt(0, (int)world.getHeight()));
-            animals.add(new Animal(10,pose,DNA,(float)(0.0),world));
+            //animals.add(new Animal,(10,pose,DNA,(float)(0.0),world,));
             draw();
         }
     }

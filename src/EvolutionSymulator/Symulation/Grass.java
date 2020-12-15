@@ -7,7 +7,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Grass extends AbstractWorldMapElement{
 
-    private Rectangle representation;
+    public Rectangle representation;
     private Pane world;
     private Color representationColor = Color.DARKGREEN;
 
@@ -32,8 +32,8 @@ public class Grass extends AbstractWorldMapElement{
 
     public void draw()
     {
-        representation.setArcHeight(5);
-        representation.setArcWidth(5);
+        representation.setArcHeight(2);
+        representation.setArcWidth(1);
         representation.setLayoutX(this.position.x);
         representation.setLayoutY(this.position.y);
     }
