@@ -1,7 +1,10 @@
 package Symulation;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -9,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Map {
     private final int defaultEnergy;
-    int EnergyPerDay;
     int Height;
     int Width;
     float JungleHeight;
@@ -21,6 +23,7 @@ public class Map {
     Pane World;
     int OneDayCost;
     int GrassEnergy;
+    Rectangle jungle;
     public java.util.Map<Vector2d, ArrayList<Animal>> Animals = new HashMap<>();
     public java.util.Map<Vector2d, Grass> Grasses = new HashMap<>();
 
@@ -36,7 +39,13 @@ public class Map {
         this.RightTopCorner = new Vector2d(Width, Height);
         this.LeftBottomCornerJungle = new Vector2d((int) ((this.Width - this.Width * this.JungleWidth) / 2), (int) ((this.Height - this.Height * this.JungleHeight) / 2));
         this.RightTopCornerJungle = this.LeftBottomCornerJungle.add(new Vector2d((int) (this.Width * this.JungleWidth), (int) (this.Height * this.JungleHeight)));
-        int i = 0;
+        jungle = new Rectangle();
+        jungle.setX(LeftBottomCornerJungle.x*this.World.getWidth()/this.Width);
+        jungle.setY(LeftBottomCornerJungle.y*this.World.getHeight()/this.Height);
+        jungle.setWidth((RightTopCornerJungle.x-LeftBottomCornerJungle.x)*this.World.getWidth()/this.Width);
+        jungle.setHeight((RightTopCornerJungle.y-LeftBottomCornerJungle.y)*this.World.getHeight()/this.Height);
+        jungle.setFill(Color.DARKGREEN);
+        world.getChildren().add(jungle);
         spawnGrass(numberOfGrass / 2, this.LeftBottomCorner, this.RightTopCorner);
         spawnGrass(numberOfGrass / 2, LeftBottomCornerJungle, RightTopCornerJungle);
         spawnAnimals(numberOfAnimals);
@@ -69,7 +78,7 @@ public class Map {
         int y = generator.nextInt(rightTopCorner.y - leftBottomCorner.y) + leftBottomCorner.y;
         Vector2d spawnPosition = new Vector2d(x, y);
         if (!isOccupied(spawnPosition)) {
-            Grass actualGrass = new Grass(spawnPosition, this.World);
+            Grass actualGrass = new Grass(spawnPosition, this.World,this);
             this.Grasses.put(spawnPosition, actualGrass);
             return true;
         }
@@ -78,9 +87,12 @@ public class Map {
 
     public void spawnGrass(int numberOfGrass, Vector2d leftBottomCorner, Vector2d rightTopCorner) {
         int i = 0;
-        while (i < numberOfGrass) {
+        int counter =0;
+        while (i < numberOfGrass && counter < 50) {
             if (placeGrass(leftBottomCorner, rightTopCorner)) {
                 i++;
+            }else {
+                counter++;
             }
         }
     }
@@ -105,7 +117,6 @@ public class Map {
     public void eating() {
         for (Vector2d positions : this.Animals.keySet()) {
             if (isOccupiedByGrass(positions)) {
-                System.out.println("tutaj");
                 this.World.getChildren().remove(this.Grasses.get(positions).representation);
                 this.Grasses.remove(positions);
                 ArrayList<Animal> animalsAtPostion = this.Animals.get(positions);
@@ -221,5 +232,11 @@ public class Map {
         liveCost();
 
     }
-
+    public void changeParameters(int height,int width,int dayEnergy,int grassEnergy)
+    {
+        this.Height = height;
+        this.Width = width;
+        this.OneDayCost = dayEnergy;
+        this.GrassEnergy = grassEnergy;
+    }
 }

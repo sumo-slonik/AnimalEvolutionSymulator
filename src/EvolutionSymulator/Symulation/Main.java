@@ -10,8 +10,6 @@ public class Main {
             DNA2[i]=2;
         }
         Animal zwierze1 = new Animal(100,new Vector2d(1,1),DNA1,(float)0.3);
-        System.out.println(zwierze1.getTiredness());
         zwierze1.eatingGrass(10);
-        System.out.println(zwierze1.getTiredness());
     }
 }

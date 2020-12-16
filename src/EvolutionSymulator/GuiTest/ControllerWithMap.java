@@ -1,7 +1,6 @@
 package GuiTest;
 
 import Symulation.Map;
-import Symulation.Simulator;
 import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,18 +12,23 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 
-public class ControlerWithMap {
+public class ControllerWithMap {
     int Height;
     int Width;
-    float JungleProportion;
+    float JungleProportion = (float)0.5;
     int StartEnergy;
     int DayEnergy;
     int GrassEnergy;
     int AnimalNumber;
     int GrassNumber;
     int Days;
+    boolean firstTime = true;
+    public static long FPS = 30L;
+    @FXML
+    Slider fpsSlider;
     @FXML
     Pane world;
     @FXML
@@ -67,8 +71,9 @@ public class ControlerWithMap {
     TextField grassNumberText;
     @FXML
     TextField daysText;
-    Simulator sim;
-
+    @FXML
+    Pane ChartPopulation;
+    boolean isChange = false;
     Map newMap;
     private Movment clock;
     private class Movment extends AnimationTimer
@@ -77,7 +82,7 @@ public class ControlerWithMap {
         @Override
         public void handle(long now)
         {
-            long framesPerSecond = 100L;
+            long framesPerSecond = FPS;
             long interval = 1000000000L / framesPerSecond;
             if(now-last> interval)
             {
@@ -100,6 +105,12 @@ public class ControlerWithMap {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 setWidth();
+            }
+        });
+        fpsSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                setFPS();
             }
         });
         jungleSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -150,63 +161,83 @@ public class ControlerWithMap {
         setStartEnergy();
         dayEnergyText.setText("0");
     }
+    public void setFPS()
+    {
+        FPS = (long) fpsSlider.getValue();
+    }
     public void setHeight()
     {
+
         this.Height = (int) heightSlider.getValue();
         heightText.setText(""+this.Height);
+        isChange = true;
     }
     public void setWidth()
     {
         this.Width = (int) widthSlider.getValue();
         widthText.setText(""+this.Width);
+        isChange = true;
     }
     public void setJungleProportion()
     {
-        this.JungleProportion = (int) jungleSlider.getValue();
+        reset();
+        this.JungleProportion = (float) jungleSlider.getValue();
         jungleText.setText(""+this.JungleProportion);
+        isChange = true;
     }
     public void setStartEnergy()
     {
+        reset();
         this.StartEnergy= (int) startEnergySlider.getValue();
         startEnergyText.setText(""+this.StartEnergy);
+        isChange = true;
     }
     public void setDayEnergy()
     {
         this.DayEnergy = (int) dayEnergySlider.getValue();
         dayEnergyText.setText(""+this.DayEnergy);
+        isChange = true;
     }
     public void setGrassEnergy()
     {
         this.GrassEnergy = (int) grassEnergySlider.getValue();
         grassEnergyText.setText(""+this.GrassEnergy);
+        isChange = true;
     }
     public void setAnimalNumber()
     {
+        reset();
         this.AnimalNumber = (int) animalsSlider.getValue();
         animalNumberText.setText(""+this.AnimalNumber);
+        isChange = true;
     }
     public void setGrassNumber()
     {
+        reset();
         this.GrassNumber = (int) grassSlider.getValue();
         grassNumberText.setText(""+this.GrassNumber);
+        isChange = true;
     }
-
     @FXML
     public void reset()
     {
         stop();
-        Days = 0;
         world.getChildren().clear();
-        newMap = new Map(world,100,100,(float) 0.5,(float)0.5,1000,500,500,50,1);
-        start();
-        stop();
+        newMap = new Map(world,Height,Width,JungleProportion,JungleProportion,GrassNumber,AnimalNumber,StartEnergy,GrassEnergy,DayEnergy);
+        step();
+        Days = 0;
+        daysText.setText(""+Days);
     }
     @FXML
     public void step()
     {
+        if (isChange)
+        {
+            isChange = false;
+            newMap.changeParameters(Height,Width,DayEnergy,GrassEnergy);
+        }
         Days+=1;
         daysText.setText(""+Days);
-        System.out.println(this.Height);
         newMap.oneDayPass();
         newMap.draw();
     }
@@ -230,5 +261,7 @@ public class ControlerWithMap {
         disableButtons(false,true,false);
         clock.stop();
     }
+
+
 
 }

@@ -12,8 +12,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Animal extends AbstractWorldMapElement {
     //energy of the animal
+    int bornDay;
+    AnimalObserver observer;
     private final int Energy;
-    private final int size = 5;
+    private int size = 5;
     //DNA determines the probability of movement in a given direction
     private final int[] DNA;
     private Vector2d Position;
@@ -26,7 +28,7 @@ public class Animal extends AbstractWorldMapElement {
     private Pane world;
     private Color representationColor = Color.BROWN;
 
-    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world,Map map) {
+    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map) {
         this.map = map;
         this.Energy = Energy;
         this.world = world;
@@ -34,7 +36,7 @@ public class Animal extends AbstractWorldMapElement {
         this.orientation = MapDirection.NORTH;
         this.DNA = DNA;
         this.Tiredness = tiredness;
-        this.representation = new Circle(5, representationColor);
+        this.representation = new Circle(this.world.getHeight() / this.map.Height / 2, representationColor);
         representation.setStroke(Color.BLACK);
         world.getChildren().add(representation);
     }
@@ -89,27 +91,25 @@ public class Animal extends AbstractWorldMapElement {
         if (this.world == null) {
             return new Animal(ChildEnergy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5);
         }
-        return new Animal(ChildEnergy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world);
+        return new Animal(ChildEnergy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map);
     }
 
     public void Move() {
+        this.size = (int) this.representation.getRadius();
         int rand = ThreadLocalRandom.current().nextInt(0, 32);
         rand = this.DNA[rand];
         for (int i = 0; i <= rand; i++) {
             this.orientation = this.orientation.next();
         }
         this.Position = this.Position.add(this.orientation.toOneStepVector());
-        if (this.Position.x > this.world.getWidth() - size) {
-            this.Position = new Vector2d(size, this.Position.y);
+        this.Position = new Vector2d(this.Position.x % this.map.Width,this.Position.y % this.map.Height);
+        if (this.Position.x < 0)
+        {
+            this.Position = new Vector2d(this.map.Width-1,this.Position.y);
         }
-        if (this.Position.y > this.world.getHeight() - size) {
-            this.Position = new Vector2d(this.Position.x, size);
-        }
-        if (this.Position.x < size) {
-            this.Position = new Vector2d(size, this.Position.y);
-        }
-        if (this.Position.y < size) {
-            this.Position = new Vector2d(this.Position.x, size);
+        if (this.Position.y < 0)
+        {
+            this.Position = new Vector2d(this.Position.x,this.map.Height-1);
         }
 
     }
@@ -132,11 +132,17 @@ public class Animal extends AbstractWorldMapElement {
         return this.DNA;
     }
 
-    public void draw() {
+    public void setEnergyColor() {
+        float value = 1 - this.Tiredness;
+        this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
+    }
 
-        representation.setRadius(this.world.getHeight()/this.);
-        representation.setTranslateX(Position.x);
-        representation.setTranslateY(Position.y);
+    public void draw() {
+        setEnergyColor();
+        representation.setFill(representationColor);
+        representation.setRadius(this.world.getHeight() / this.map.Height / 2);
+        representation.setTranslateX(Position.x * this.world.getWidth() / this.map.Width + this.world.getWidth() / this.map.Width / 2);
+        representation.setTranslateY(Position.y * this.world.getHeight() / this.map.Height + this.world.getHeight() / this.map.Height / 2);
     }
 
     public Vector2d getPosition() {
@@ -176,19 +182,31 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public float getEnergy() {
-        return this.Energy*(1-this.Tiredness);
+        return this.Energy * (1 - this.Tiredness);
     }
 
     public void livingCost(int oneDayCost) {
         float deltaTiredness = (float) oneDayCost / this.Energy;
-        this.Tiredness +=deltaTiredness;
-        this.Tiredness = Math.min(1,this.Tiredness);
+        this.Tiredness += deltaTiredness;
+        this.Tiredness = Math.min(1, this.Tiredness);
     }
-    public void eatingGrass(int oneGrassEnergy)
-    {
+
+    public void eatingGrass(int oneGrassEnergy) {
         float deltaTiredness = (float) oneGrassEnergy / this.Energy;
         this.Tiredness -= deltaTiredness;
-        this.Tiredness = Math.max(0,this.Tiredness);
+        this.Tiredness = Math.max(0, this.Tiredness);
+    }
+    public void kill(int actualDay)
+    {
+        observer.animalKill(this,actualDay);
+    }
+    public void born()
+    {
+        observer.animalSpawn(this);
+    }
+    public int getAge(int actualDay)
+    {
+        return actualDay-this.bornDay;
     }
 }
 
