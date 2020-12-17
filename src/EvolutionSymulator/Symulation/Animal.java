@@ -5,7 +5,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,12 +22,16 @@ public class Animal extends AbstractWorldMapElement {
     // means energy consumption, belong to the range [0,1]
     private float Tiredness = (float) 0.0;
     private Map map = null;
-    private final ArrayList<IPositionChangeObserver> observers = new ArrayList<>(0);
     public Circle representation;
     private Pane world;
     private Color representationColor = Color.BROWN;
+    Integer children;
+    boolean isTheChosenOne;
 
-    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map) {
+    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map,AnimalObserver observer) {
+        this.isTheChosenOne = false;
+        this.children =0;
+        this.observer = observer;
         this.map = map;
         this.Energy = Energy;
         this.world = world;
@@ -41,7 +44,9 @@ public class Animal extends AbstractWorldMapElement {
         world.getChildren().add(representation);
     }
 
-    public Animal(int Energy, Vector2d Position, float tiredness, Pane world) {
+    public Animal(int Energy, Vector2d Position, float tiredness, Pane world,AnimalObserver observer) {
+        this.children =0;
+        this.observer = observer;
         this.Energy = Energy;
         this.Position = Position;
         this.orientation = MapDirection.NORTH;
@@ -54,16 +59,10 @@ public class Animal extends AbstractWorldMapElement {
         this.DNA = this.DNACompleteTest(DNA);
     }
 
-    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness) {
-        this.Energy = Energy;
-        this.Position = Position;
-        this.orientation = MapDirection.NORTH;
-        this.DNA = DNA;
-        this.Tiredness = tiredness;
-    }
-
     // process of recreating new animal witch mixed dna of two parents
     public Animal demagging(Animal secondParent) {
+        this.addChildren();
+        secondParent.addChildren();
         int rand = ThreadLocalRandom.current().nextInt(0, 12 + 1);
         int[] FirstDNA = Arrays.copyOfRange(this.DNA, rand, rand + 20);
         rand = ThreadLocalRandom.current().nextInt(0, 19 + 1);
@@ -87,13 +86,10 @@ public class Animal extends AbstractWorldMapElement {
         }
         this.Tiredness += 0.25;
         secondParent.Tiredness += 0.25;
-        int ChildEnergy = this.Energy;
-        if (this.world == null) {
-            return new Animal(ChildEnergy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5);
-        }
-        return new Animal(ChildEnergy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map);
+        Animal child = new Animal(this.Energy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map,this.observer);
+        child.born(this.map.ActualDay);
+        return child;
     }
-
     public void Move() {
         this.size = (int) this.representation.getRadius();
         int rand = ThreadLocalRandom.current().nextInt(0, 32);
@@ -111,30 +107,22 @@ public class Animal extends AbstractWorldMapElement {
         {
             this.Position = new Vector2d(this.Position.x,this.map.Height-1);
         }
-
     }
 
-    public void addObserver(IPositionChangeObserver observer) {
-        this.observers.add(observer);
-    }
-
-    public void removeObserver(IPositionChangeObserver observer) {
-        this.observers.remove(observer);
-    }
-
-    public void positionChanged(Vector2d old, Vector2d actual) {
-        for (IPositionChangeObserver observer : this.observers) {
-            observer.positionChanged(old, actual);
-        }
-    }
 
     public int[] getDna() {
         return this.DNA;
     }
 
     public void setEnergyColor() {
-        float value = 1 - this.Tiredness;
-        this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
+        if (isTheChosenOne)
+        {
+            this.representationColor = Color.rgb(12 ,62, 225);
+        }
+        else {
+            float value = 1 - this.Tiredness;
+            this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
+        }
     }
 
     public void draw() {
@@ -200,13 +188,22 @@ public class Animal extends AbstractWorldMapElement {
     {
         observer.animalKill(this,actualDay);
     }
-    public void born()
+    public void born(int actualDay)
     {
+        this.bornDay = actualDay;
         observer.animalSpawn(this);
+
     }
     public int getAge(int actualDay)
     {
         return actualDay-this.bornDay;
     }
+    public int getBornDay()
+    {
+        return this.bornDay;
+    }
+    public Integer getChildren(){return this.children;}
+    public void addChildren(){this.children++;}
+
 }
 

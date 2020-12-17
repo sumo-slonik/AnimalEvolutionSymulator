@@ -26,8 +26,13 @@ public class Map {
     Rectangle jungle;
     public java.util.Map<Vector2d, ArrayList<Animal>> Animals = new HashMap<>();
     public java.util.Map<Vector2d, Grass> Grasses = new HashMap<>();
+    AnimalObserver Observer;
+    Integer ActualDay;
 
-    public Map(Pane world, int height, int width, float jungleHeight, float jungleWidth, int numberOfGrass, int numberOfAnimals, int defaultEnergy, int GrassEnergy,int oneDayCost) {
+    public Map(Pane world, int height, int width, float jungleHeight, float jungleWidth, int numberOfGrass, int numberOfAnimals, int defaultEnergy, int GrassEnergy,int oneDayCost,AnimalObserver observer) {
+        this.Observer = observer;
+        this.Observer.reset();
+        this.ActualDay =0;
         this.OneDayCost = oneDayCost;
         this.GrassEnergy = GrassEnergy;
         this.Height = height;
@@ -54,24 +59,34 @@ public class Map {
 
     public void spawnAnimals(int numberOfAnimals) {
         Random generator = new Random();
+        int counter = 0;
         for (int i = 0; i < numberOfAnimals; i++) {
             int height = this.RightTopCornerJungle.y - this.LeftBottomCornerJungle.y;
             int width = this.RightTopCornerJungle.x - this.LeftBottomCornerJungle.x;
             Vector2d position = new Vector2d(generator.nextInt(width) + this.LeftBottomCornerJungle.x,
                     generator.nextInt(height) + this.LeftBottomCornerJungle.y);
             if (!this.isOccupied(position)) {
+                counter = 0;
                 int[] DNA = new int[32];
                 for (int index = 0; index < 32; index++) {
                     DNA[index] = ThreadLocalRandom.current().nextInt(0, 9);
                 }
-                Animal actualAnimal = new Animal(defaultEnergy, position, DNA, 0, this.World,this);
+                Animal actualAnimal = new Animal(defaultEnergy, position, DNA, 0, this.World,this,this.Observer);
                 ArrayList<Animal> animals = new ArrayList<>();
                 animals.add(actualAnimal);
                 this.Animals.put(position, animals);
-            } else i--;
+                actualAnimal.born(this.ActualDay);
+            }
+            else
+            {
+                if (counter < 10)
+                {
+                    i--;
+                }
+                counter += 1;
+            }
         }
     }
-
     public boolean placeGrass(Vector2d leftBottomCorner, Vector2d rightTopCorner) {
         Random generator = new Random();
         int x = generator.nextInt(rightTopCorner.x - leftBottomCorner.x) + leftBottomCorner.x;
@@ -151,6 +166,7 @@ public class Map {
         }
         for (Animal actual : Animals) {
             if (actual.getEnergy() < this.OneDayCost) {
+                actual.kill(this.ActualDay);
                 if (this.Animals.get(actual.getPosition()).size() == 1) {
                     this.Animals.remove(actual.getPosition());
                 } else {
@@ -167,8 +183,11 @@ public class Map {
         for (ArrayList<Animal> animals : this.Animals.values()) {
             Animals.addAll(animals);
         }
-
+        float actualEnergySum=0;
+        int actualChildrenSum=0;
         for (Animal animal : Animals) {
+            actualChildrenSum+= animal.getChildren();
+            actualEnergySum+= animal.getEnergy();
             if (this.Animals.get(animal.getPosition()).size() > 1) {
                 this.Animals.get(animal.getPosition()).remove(animal);
             } else {
@@ -178,6 +197,8 @@ public class Map {
             this.Animals.computeIfAbsent(animal.getPosition(), k -> new ArrayList<Animal>());
             this.Animals.get(animal.getPosition()).add(animal);
         }
+        this.Observer.setActualChildrenSum(actualChildrenSum);
+        this.Observer.setActualEnergySum(actualEnergySum);
     }
     public void reproduction() {
         ArrayList<Animal> children = new ArrayList<>();
@@ -187,8 +208,10 @@ public class Map {
                 onePosition.sort(comparator);
                 Animal firsParent = onePosition.get(0);
                 Animal secondParent = onePosition.get(1);
-                Animal child = firsParent.demagging(secondParent);
-                children.add(child);
+                if (firsParent.getEnergy()>this.defaultEnergy/2 && secondParent.getEnergy()>this.defaultEnergy/2) {
+                    Animal child = firsParent.demagging(secondParent);
+                    children.add(child);
+                }
             }
         }
         for (Animal actual : children) {
@@ -200,6 +223,7 @@ public class Map {
                 this.Animals.put(actual.getPosition(), onePosition);
             }
         }
+        System.out.println(this.ActualDay+" "+children.size());
     }
 
     public void draw() {
@@ -230,6 +254,7 @@ public class Map {
         reproduction();
         moveAll();
         liveCost();
+        this.ActualDay++;
 
     }
     public void changeParameters(int height,int width,int dayEnergy,int grassEnergy)
@@ -238,5 +263,22 @@ public class Map {
         this.Width = width;
         this.OneDayCost = dayEnergy;
         this.GrassEnergy = grassEnergy;
+    }
+    public int getDate()
+    {
+        return this.ActualDay;
+    }
+    public int getWidth() {return this.Width;}
+    public int getHeight(){return this.Height;}
+    public Animal getAnimalAtPosition(Vector2d pose)
+    {
+        if( this.Animals.get(pose) == null)
+        {
+            return null;
+        }else
+        {
+            this.Animals.get(pose).get(0).isTheChosenOne = true;
+            return this.Animals.get(pose).get(0);
+        }
     }
 }
