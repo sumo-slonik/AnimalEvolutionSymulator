@@ -40,6 +40,8 @@ public class ControllerWithMap {
     int Days;
     int posX;
     int posY;
+    boolean isFirstTime=true;
+    boolean isSecondMapOnScreen = false;
     int[] ArchivalPopulation = new int[100];
     AnimalObserver observer = new AnimalObserver();
     boolean firstTime = true;
@@ -136,6 +138,15 @@ public class ControllerWithMap {
     boolean isChange = false;
     @FXML
     CheckBox colorMostPopularDNA;
+    @FXML
+    Button secondStart;
+    @FXML
+    Button secondStop;
+    @FXML
+    Button secondReset;
+    @FXML
+    Pane secondWorld;
+
     Map newMap;
     private Movement clock;
     Chart populationChart;
@@ -295,28 +306,18 @@ public class ControllerWithMap {
         stop();
         resetCharts();
         world.getChildren().clear();
+        colorMostPopularDNA.setSelected(false);
         newMap = new Map(world, Height, Width, JungleProportion, JungleProportion, GrassNumber, AnimalNumber, StartEnergy, GrassEnergy, DayEnergy, observer);
-        step();
         Days = 0;
         daysText.setText("" + Days);
+        newMap.draw();
     }
 
     @FXML
     public void step() {
-        if (colorMostPopularDNA.isSelected())
-        {
-            newMap.findingPopularAnimalDna();
-        }
-        else
-        {
-            newMap.unsetAllAsPopularAnimal();
-        }
         if (observer.getActualPopulation() == 0) {
             stop();
             return;
-        }
-        if (secondMap.isSelected()) {
-            world.setMaxHeight(50);
         }
         drawAnimalStats();
         drawDnaStats();
@@ -341,6 +342,11 @@ public class ControllerWithMap {
 
     @FXML
     public void start() {
+        if (isFirstTime)
+        {
+            reset();
+            isFirstTime=false;
+        }
         disableButtons(true, false, false);
         clock.start();
     }
@@ -375,7 +381,7 @@ public class ControllerWithMap {
 
     public void drawDnaStats() {
         DnaStats.getChildren().clear();
-        int sum = 1;
+        Long sum = 1L;
         for (int i : observer.getGenCounter()) {
             sum += i;
         }
@@ -407,9 +413,9 @@ public class ControllerWithMap {
     }
 
     public Vector2d getPoseFromPixels(int x, int y) {
-        int rectangleSizeX = (int) this.world.getWidth() / newMap.getWidth();
-        int rectangleSizeY = (int) this.world.getHeight() / newMap.getHeight();
-        return new Vector2d(x / rectangleSizeX, y / rectangleSizeY - 1);
+        int XCoordinate = (int) (x/this.world.getWidth()*newMap.getWidth());
+        int YCoordinate = (int) (y/this.world.getHeight()*newMap.getHeight());
+        return new Vector2d(XCoordinate, YCoordinate);
     }
 
     public void drawAnimalStats() {
@@ -429,12 +435,65 @@ public class ControllerWithMap {
                 }
                 energy = new Rectangle(10, 10, (int) 125 * (1 - Selected.getTiredness()), 20);
             }
-            AnimalEnergyPrompt.setText("" + (int) (((1 - Selected.getTiredness()) * 100) % 100) + "%");
+            AnimalEnergyPrompt.setText("" + (int) ((1 - Selected.getTiredness()) * 100) + "%");
             AnimalEnergy.getChildren().clear();
             energy.setFill(Color.rgb(Math.round(255 * (Selected.getTiredness())), Math.round(222 * (1 - this.Selected.getTiredness())), 50));
             AnimalEnergy.getChildren().add(energy);
             AnimalDNA.setText(Selected.getDnaAsString());
         }
+    }
+    public void showSecondMap()
+    {
+        isSecondMapOnScreen = true;
+        stop();
+        this.world.getChildren().clear();
+        world.setPrefHeight(368);
+        world.setMaxHeight(368);
+        world.setMinHeight(368);
+        secondWorld.setPrefHeight(340);
+        secondWorld.setMaxHeight(340);
+        secondWorld.setMinHeight(340);
+        secondWorld.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+        secondStart.setPrefHeight(25);
+        secondStop.setPrefHeight(25);
+        secondReset.setPrefHeight(25);
+    }
+    public void hideSecondMap()
+    {
+        isSecondMapOnScreen = false;
+        stop();
+        this.world.getChildren().clear();
+        secondWorld.setPrefHeight(0);
+        secondWorld.setMinHeight(0);
+        secondWorld.setMaxHeight(0);
+        secondStart.setPrefHeight(0);
+        secondStop.setPrefHeight(0);
+        secondReset.setPrefHeight(0);
+        world.setPrefHeight(736);
+        world.setMaxHeight(736);
+        world.setMinHeight(736);
+    }
+    public void secondMap(){
+        if (secondMap.isSelected() && !isSecondMapOnScreen)
+        {
+            showSecondMap();
+        }else if(!secondMap.isSelected()&& isSecondMapOnScreen)
+        {
+            hideSecondMap();
+        }
+        isFirstTime=true;
+    }
+    public void ColorPopularDNA()
+    {
+        if (colorMostPopularDNA.isSelected())
+        {
+            newMap.findingPopularAnimalDna();
+        }
+        else
+        {
+            newMap.unsetAllAsPopularAnimal();
+        }
+        newMap.draw();
     }
 }
 
