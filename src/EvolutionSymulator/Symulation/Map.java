@@ -16,6 +16,7 @@ public class Map {
     int Width;
     float JungleHeight;
     float JungleWidth;
+    Animal Selected;
     Vector2d LeftBottomCorner = new Vector2d(0, 0);
     Vector2d RightTopCorner;
     Vector2d LeftBottomCornerJungle;
@@ -277,8 +278,18 @@ public class Map {
             return null;
         }else
         {
+            if (this.Selected != null)
+            {
+                this.Selected.isTheChosenOne = false;
+                this.Selected.draw();
+            }
             this.Animals.get(pose).get(0).isTheChosenOne = true;
+            this.Selected = this.Animals.get(pose).get(0);
             return this.Animals.get(pose).get(0);
         }
+    }
+    public Animal getSelected()
+    {
+        return this.Selected;
     }
 }

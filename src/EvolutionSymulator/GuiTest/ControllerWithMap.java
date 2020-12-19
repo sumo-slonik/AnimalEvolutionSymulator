@@ -132,6 +132,8 @@ public class ControllerWithMap {
     Animal Selected;
     @FXML
     Pane AnimalEnergy;
+    @FXML
+    TextField AnimalEnergyPrompt;
 
     boolean isChange = false;
     Map newMap;
@@ -297,16 +299,7 @@ public class ControllerWithMap {
 
     @FXML
     public void step() {
-        if (Selected!=null)
-        {
-            Children.setText(""+Selected.getChildren());
-            BirthDay.setText(""+Selected.getBornDay());
-            DedDay.setText("Mam się dobrze");
-            AnimalEnergy.getChildren().clear();
-            Rectangle energy = new Rectangle(10,10,(int)125*(1-Selected.getTiredness()),20);
-            energy.setFill(Color.GREEN);
-            AnimalEnergy.getChildren().add(energy);
-        }
+        drawAnimalStats();
         drawDnaStats();
         drawChart(newMap.getDate());
         drawChartLifeTime(newMap.getDate());
@@ -352,6 +345,8 @@ public class ControllerWithMap {
             Selected = newMap.getAnimalAtPosition(getPoseFromPixels(posX,posY));
             if (Selected != null)
             {
+                Selected.draw();
+                drawAnimalStats();
                 System.out.println("___________________");
                 System.out.println(Selected.getEnergy());
                 System.out.println("___________________");
@@ -448,6 +443,30 @@ public class ControllerWithMap {
                 int rectangleSizeX = (int) this.world.getWidth()/newMap.getWidth();
                 int rectangleSizeY = (int) this.world.getHeight()/newMap.getHeight();
                 return new Vector2d(x/rectangleSizeX,y/rectangleSizeY-1);
+            }
+            public void drawAnimalStats()
+            {
+                if (Selected!=null)
+                {
+                    Children.setText(""+Selected.getChildren());
+                    BirthDay.setText(""+Selected.getBirthDay());
+                    Rectangle energy;
+                    if (Selected.isDeath())
+                    {
+                        DedDay.setText("" + Selected.getDeathDate());
+                        energy = new Rectangle(10,10,0,20);
+
+                    }
+                    else {
+                        if (Selected.getTiredness()<0.5){DedDay.setText("Mam się dobrze");}
+                        else {DedDay.setText("Mam się średnio, ale żyję");}
+                        energy = new Rectangle(10,10,(int)125*(1-Selected.getTiredness()),20);
+                    }
+                    AnimalEnergyPrompt.setText(""+(int)(((1-Selected.getTiredness())*100)%100)+"%");
+                    AnimalEnergy.getChildren().clear();
+                    energy.setFill(Color.rgb(Math.round(255*(Selected.getTiredness())),Math.round(222*(1-this.Selected.getTiredness())),50));
+                    AnimalEnergy.getChildren().add(energy);
+                }
             }
     }
 

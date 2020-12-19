@@ -11,7 +11,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Animal extends AbstractWorldMapElement {
     //energy of the animal
-    int bornDay;
+    int birthDay;
+    int deathDate;
+    boolean death;
     AnimalObserver observer;
     private final int Energy;
     private int size = 5;
@@ -29,6 +31,7 @@ public class Animal extends AbstractWorldMapElement {
     boolean isTheChosenOne;
 
     public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map,AnimalObserver observer) {
+        this.death = false;
         this.isTheChosenOne = false;
         this.children =0;
         this.observer = observer;
@@ -186,24 +189,36 @@ public class Animal extends AbstractWorldMapElement {
     }
     public void kill(int actualDay)
     {
+        if (this == this.map.getSelected())
+        {
+            this.death = true;
+            this.deathDate = actualDay;
+        }
         observer.animalKill(this,actualDay);
     }
     public void born(int actualDay)
     {
-        this.bornDay = actualDay;
+        this.birthDay = actualDay;
         observer.animalSpawn(this);
 
     }
     public int getAge(int actualDay)
     {
-        return actualDay-this.bornDay;
+        return actualDay-this.birthDay;
     }
-    public int getBornDay()
+    public int getBirthDay()
     {
-        return this.bornDay;
+        return this.birthDay;
     }
     public Integer getChildren(){return this.children;}
     public void addChildren(){this.children++;}
-
+    public boolean isDeath()
+    {
+        return this.death;
+    }
+    public int getDeathDate()
+    {
+        return this.deathDate;
+    }
 }
 

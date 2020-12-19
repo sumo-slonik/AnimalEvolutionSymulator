@@ -265,13 +265,66 @@
                         </VBox>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="298.0" prefWidth="190.0">
                      <children>
-                        <ImageView fitHeight="278.0" fitWidth="192.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/Legenda.png" />
-                           </image>
-                        </ImageView>
+                        <VBox prefHeight="100.0" prefWidth="190.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Legenda" textAlignment="CENTER" wrappingWidth="190.13671493530273">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Text>
+                              <HBox prefHeight="277.0" prefWidth="190.0">
+                                 <children>
+                                    <VBox prefHeight="266.0" prefWidth="138.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Poziom Eenergi" />
+                                          <ImageView fitHeight="252.0" fitWidth="82.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/Poziom%20Energi.jpg" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                       <children>
+                                          <Pane prefHeight="42.0" prefWidth="36.0" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="100%" />
+                                          <Pane prefHeight="200.0" prefWidth="200.0" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="0%" />
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets left="3.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                       <children>
+                                          <Pane prefHeight="88.0" prefWidth="35.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/zwierzak.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane prefHeight="33.0" prefWidth="35.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/roślinka.jpg" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                       <children>
+                                          <Pane prefHeight="95.0" prefWidth="41.0" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zwierze" wrappingWidth="40.5703125" />
+                                          <Pane prefHeight="59.0" prefWidth="41.0" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Roślina" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
                </children>
@@ -320,7 +373,12 @@
                                                       <Font size="30.0" />
                                                    </font>
                                                 </Text>
-                                                <Pane fx:id="AnimalEnergy" prefHeight="200.0" prefWidth="200.0" />
+                                                <Pane fx:id="AnimalEnergy" prefHeight="54.0" prefWidth="143.0" />
+                                                <TextField fx:id="AnimalEnergyPrompt" prefHeight="54.0" prefWidth="103.0">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </TextField>
                                              </children>
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0">

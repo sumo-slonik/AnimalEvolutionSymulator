@@ -36,7 +36,7 @@ public class AnimalObserver {
         for (int i : killedAnimal.getDna()) {
             genCounter[i]--;
         }
-        liveTimeSum += killedAnimal.bornDay;
+        liveTimeSum += killedAnimal.birthDay;
         averageLifeTime = (float) liveTimeSum / dedPopulation;
     }
 
