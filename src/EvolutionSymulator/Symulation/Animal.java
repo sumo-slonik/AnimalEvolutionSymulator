@@ -1,5 +1,6 @@
 package Symulation;
 
+//klasa reprezentująca zwierzę w symulacji
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -10,30 +11,32 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Animal extends AbstractWorldMapElement {
-    //energy of the animal
+    //data urodzenia i śmierci zwierzaka
     int birthDay;
     int deathDate;
     boolean death;
     AnimalObserver observer;
+    //maksymalna ilość energi
     private final int Energy;
-    private int size = 5;
-    //DNA determines the probability of movement in a given direction
+    //dna określa prawdopodobieństwo ruchu w określonych kierunkach
     private final int[] DNA;
     private Vector2d Position;
     private MapDirection orientation;
-    // means energy consumption, belong to the range [0,1]
-    private float Tiredness = (float) 0.0;
+    // ozancza zmęczenie zwierzęcia w od 0 do 1, gdzie 0 oznacza brak zmęczenia a 1 całkowity brak energi
+    private float Tiredness;
+    //mapa na której jest zwierze
     private Map map = null;
     public Circle representation;
     private Pane world;
     private Color representationColor = Color.BROWN;
+    //liczba dzieci
     Integer children;
     boolean isTheChosenOne;
 
-    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map,AnimalObserver observer) {
+    public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map, AnimalObserver observer) {
         this.death = false;
         this.isTheChosenOne = false;
-        this.children =0;
+        this.children = 0;
         this.observer = observer;
         this.map = map;
         this.Energy = Energy;
@@ -47,8 +50,8 @@ public class Animal extends AbstractWorldMapElement {
         world.getChildren().add(representation);
     }
 
-    public Animal(int Energy, Vector2d Position, float tiredness, Pane world,AnimalObserver observer) {
-        this.children =0;
+    public Animal(int Energy, Vector2d Position, float tiredness, Pane world, AnimalObserver observer) {
+        this.children = 0;
         this.observer = observer;
         this.Energy = Energy;
         this.Position = Position;
@@ -89,26 +92,25 @@ public class Animal extends AbstractWorldMapElement {
         }
         this.Tiredness += 0.25;
         secondParent.Tiredness += 0.25;
-        Animal child = new Animal(this.Energy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map,this.observer);
+        Animal child = new Animal(this.Energy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map, this.observer);
         child.born(this.map.ActualDay);
         return child;
     }
+
     public void Move() {
-        this.size = (int) this.representation.getRadius();
+        int size = (int) this.representation.getRadius();
         int rand = ThreadLocalRandom.current().nextInt(0, 32);
         rand = this.DNA[rand];
         for (int i = 0; i <= rand; i++) {
             this.orientation = this.orientation.next();
         }
         this.Position = this.Position.add(this.orientation.toOneStepVector());
-        this.Position = new Vector2d(this.Position.x % this.map.Width,this.Position.y % this.map.Height);
-        if (this.Position.x < 0)
-        {
-            this.Position = new Vector2d(this.map.Width-1,this.Position.y);
+        this.Position = new Vector2d(this.Position.x % this.map.Width, this.Position.y % this.map.Height);
+        if (this.Position.x < 0) {
+            this.Position = new Vector2d(this.map.Width - 1, this.Position.y);
         }
-        if (this.Position.y < 0)
-        {
-            this.Position = new Vector2d(this.Position.x,this.map.Height-1);
+        if (this.Position.y < 0) {
+            this.Position = new Vector2d(this.Position.x, this.map.Height - 1);
         }
     }
 
@@ -118,11 +120,9 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public void setEnergyColor() {
-        if (isTheChosenOne)
-        {
-            this.representationColor = Color.rgb(12 ,62, 225);
-        }
-        else {
+        if (isTheChosenOne) {
+            this.representationColor = Color.rgb(12, 62, 225);
+        } else {
             float value = 1 - this.Tiredness;
             this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
         }
@@ -132,8 +132,8 @@ public class Animal extends AbstractWorldMapElement {
         setEnergyColor();
         representation.setFill(representationColor);
         representation.setRadius(this.world.getHeight() / this.map.Height / 2);
-        representation.setTranslateX(Position.x * this.world.getWidth() / this.map.Width + this.world.getWidth() / this.map.Width / 2);
-        representation.setTranslateY(Position.y * this.world.getHeight() / this.map.Height + this.world.getHeight() / this.map.Height / 2);
+        representation.setCenterX(Position.x * this.world.getWidth() / this.map.Width + this.world.getWidth() / this.map.Width / 2);
+        representation.setCenterY(Position.y * this.world.getHeight() / this.map.Height + this.world.getHeight() / this.map.Height / 2);
     }
 
     public Vector2d getPosition() {
@@ -145,7 +145,7 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public int[] DNACompleteTest(int[] DNA) {
-        int[] counter = new int[9];
+        int[] counter = new int[8];
         for (int value : DNA) {
             counter[value] += 1;
         }
@@ -187,38 +187,51 @@ public class Animal extends AbstractWorldMapElement {
         this.Tiredness -= deltaTiredness;
         this.Tiredness = Math.max(0, this.Tiredness);
     }
-    public void kill(int actualDay)
-    {
-        if (this == this.map.getSelected())
-        {
+
+    public void kill(int actualDay) {
+        if (this == this.map.getSelected()) {
             this.death = true;
             this.deathDate = actualDay;
         }
-        observer.animalKill(this,actualDay);
+        observer.animalKill(this, actualDay);
     }
-    public void born(int actualDay)
-    {
+
+    public void born(int actualDay) {
         this.birthDay = actualDay;
         observer.animalSpawn(this);
 
     }
-    public int getAge(int actualDay)
-    {
-        return actualDay-this.birthDay;
+
+    public int getAge(int actualDay) {
+        return actualDay - this.birthDay;
     }
-    public int getBirthDay()
-    {
+
+    public int getBirthDay() {
         return this.birthDay;
     }
-    public Integer getChildren(){return this.children;}
-    public void addChildren(){this.children++;}
-    public boolean isDeath()
-    {
+
+    public Integer getChildren() {
+        return this.children;
+    }
+
+    public void addChildren() {
+        this.children++;
+    }
+
+    public boolean isDeath() {
         return this.death;
     }
-    public int getDeathDate()
-    {
+
+    public int getDeathDate() {
         return this.deathDate;
+    }
+
+    public String getDnaAsString() {
+        StringBuilder result = new StringBuilder();
+        for (int i : this.DNA) {
+            result.append(i);
+        }
+        return result.toString();
     }
 }
 

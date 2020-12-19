@@ -12,6 +12,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -23,6 +24,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -89,8 +91,6 @@ public class ControllerWithMap {
     @FXML
     TextField daysText;
     @FXML
-    Pane ChartPopulation;
-    @FXML
     TextField NumberOfAnimals;
     @FXML
     TextField NumberOfDedAnimals;
@@ -134,7 +134,10 @@ public class ControllerWithMap {
     Pane AnimalEnergy;
     @FXML
     TextField AnimalEnergyPrompt;
-
+    @FXML
+    CheckBox secondMap;
+    @FXML
+    TextField AnimalDNA;
     boolean isChange = false;
     Map newMap;
     private Movement clock;
@@ -160,6 +163,7 @@ public class ControllerWithMap {
         PopulationSeries.setName("Zwierzątka");
         GrassSeries = new XYChart.Series();
         GrassSeries.setName("Roślinki");
+        Chart populationChart = new Chart(Linechart,x,y,new String[]{"Zwierzątka","Roślinki"},500);
         world.addEventFilter(MouseEvent.MOUSE_CLICKED,choseAnimalPose);
         heightSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -236,13 +240,12 @@ public class ControllerWithMap {
     public void setHeight() {
         this.Height = (int) heightSlider.getValue();
         heightText.setText("" + this.Height);
-        isChange = true;
+        setWidth();
     }
 
     public void setWidth() {
         this.Width = (int) widthSlider.getValue();
         widthText.setText("" + this.Width);
-        isChange = true;
         reset();
     }
 
@@ -273,9 +276,10 @@ public class ControllerWithMap {
     }
 
     public void setAnimalNumber() {
+        int proportionToSlider = (int) Math.ceil(animalsSlider.getMax()/(this.newMap.getHeight()*newMap.getWidth()*this.JungleProportion));
+        this.AnimalNumber = (int) animalsSlider.getValue()/proportionToSlider;
         reset();
-        this.AnimalNumber = (int) animalsSlider.getValue();
-        animalNumberText.setText("" + this.newMap.Animals.size());
+        animalNumberText.setText("" + this.newMap.getNumberOfAnimals());
         isChange = true;
     }
 
@@ -299,6 +303,15 @@ public class ControllerWithMap {
 
     @FXML
     public void step() {
+        if (observer.getActualPopulation()==0)
+        {
+            stop();
+            return;
+        }
+        if (secondMap.isSelected())
+        {
+            world.setMaxHeight(50);
+        }
         drawAnimalStats();
         drawDnaStats();
         drawChart(newMap.getDate());
@@ -307,7 +320,7 @@ public class ControllerWithMap {
         drawChartChildren(newMap.getDate());
         if (isChange) {
             isChange = false;
-            newMap.changeParameters(Height, Width, DayEnergy, GrassEnergy);
+            newMap.changeParameters(DayEnergy, GrassEnergy);
         }
         Days += 1;
         NumberOfAnimals.setText("" + observer.getActualPopulation());
@@ -362,6 +375,7 @@ public class ControllerWithMap {
     public void drawDnaStats() {
         DnaStats.getChildren().clear();
         int sum = 1;
+        System.out.println(Arrays.toString(observer.getGenCounter()));
         for (int i : observer.getGenCounter()) {
             sum += i;
         }
@@ -466,6 +480,7 @@ public class ControllerWithMap {
                     AnimalEnergy.getChildren().clear();
                     energy.setFill(Color.rgb(Math.round(255*(Selected.getTiredness())),Math.round(222*(1-this.Selected.getTiredness())),50));
                     AnimalEnergy.getChildren().add(energy);
+                    AnimalDNA.setText(Selected.getDnaAsString());
                 }
             }
     }
