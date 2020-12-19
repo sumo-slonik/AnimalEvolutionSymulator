@@ -33,6 +33,7 @@ public class Map {
     public java.util.Map<Vector2d, Grass> Grasses = new HashMap<>();
     AnimalObserver Observer;
     Integer ActualDay;
+    HashMap<DNA,Integer> genomes;
 
     public Map(Pane world, int height, int width, float jungleHeight, float jungleWidth, int numberOfGrass, int numberOfAnimals, int defaultEnergy, int GrassEnergy,int oneDayCost,AnimalObserver observer) {
         //obserwator śledzący parametry zwierząt
@@ -352,6 +353,55 @@ public class Map {
             }
         }
         return null;
+    }
+    public void unsetAllAsPopularAnimal()
+    {
+        ArrayList<Animal> Animals = new ArrayList<>();
+        for (ArrayList<Animal> animals : this.Animals.values()) {
+            Animals.addAll(animals);
+        }
+        for (Animal actual : Animals)
+        {
+            actual.unsetAsPopularAnimal();
+        }
+    }
+    public void findingPopularAnimalDna()
+    {
+        unsetAllAsPopularAnimal();
+        this.genomes = new HashMap<>();
+        ArrayList<Animal> Animals = new ArrayList<>();
+        for (ArrayList<Animal> animals : this.Animals.values()) {
+            Animals.addAll(animals);
+        }
+        for (Animal actual : Animals)
+        {
+            if (this.genomes.get(actual.DnaCounter)==null) {this.genomes.put(actual.DnaCounter,1);}
+            else{
+                Integer tmp = this.genomes.get(actual.DnaCounter);
+                tmp++;
+                this.genomes.remove(actual.DnaCounter);
+                this.genomes.put(actual.DnaCounter,tmp);
+            }
+        }
+        int max = 0;
+        DNA actualMostPopular = null;
+        for (DNA key: this.genomes.keySet())
+        {
+            if(this.genomes.get(key)>max)
+            {
+                actualMostPopular=key;
+                max = this.genomes.get(key);
+            }
+        }
+        for (Animal actual : Animals)
+        {
+            if (actual.getDnaCounter().equals(actualMostPopular))
+            {
+                actual.setAsPopularAnimal();
+            }
+        }
+
+
     }
     //zwracanie konkretnych wartości mapy
     public int getWidth() {return this.Width;}

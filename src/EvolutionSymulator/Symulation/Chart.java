@@ -21,12 +21,11 @@ public class Chart {
         this.oX = oX;
         this.oY = oY;
     }
-    public void addData(String[] names,int[] values)
+    public void addData(String[] names,Number[] values)
     {
         if (this.dataCounter%this.clearInterval == 0)
         {
-            dataCounter=0;
-            this.reset(this.seriesNames);
+            this.clear();
         }
         dataCounter++;
         int n = names.length;
@@ -37,6 +36,7 @@ public class Chart {
     }
     public void reset(String[] seriesNames)
     {
+        dataCounter = 0;
         this.target.getData().clear();
         for(String seriesName : seriesNames)
         {
@@ -44,6 +44,10 @@ public class Chart {
             newSeries.setName(seriesName);
             this.target.getData().add(newSeries);
         }
+    }
+    public void clear()
+    {
+        this.reset(this.seriesNames);
     }
 
 }

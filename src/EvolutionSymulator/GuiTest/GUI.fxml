@@ -329,6 +329,7 @@
                      </children>
                   </HBox>
                   <CheckBox fx:id="secondMap" mnemonicParsing="false" text="Druga niezależna mapa" />
+                  <CheckBox fx:id="colorMostPopularDNA" mnemonicParsing="false" prefHeight="70.0" prefWidth="192.0" text="Zaznacz popularny genom" />
                </children>
             </VBox>
          </children>

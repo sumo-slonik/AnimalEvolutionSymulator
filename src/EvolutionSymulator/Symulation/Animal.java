@@ -7,7 +7,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Animal extends AbstractWorldMapElement {
@@ -32,6 +31,8 @@ public class Animal extends AbstractWorldMapElement {
     //liczba dzieci
     Integer children;
     boolean isTheChosenOne;
+    boolean havingMostPopularDna;
+    DNA DnaCounter;
 
     public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map, AnimalObserver observer) {
         this.death = false;
@@ -44,25 +45,15 @@ public class Animal extends AbstractWorldMapElement {
         this.Position = Position;
         this.orientation = MapDirection.NORTH;
         this.DNA = DNA;
+        int[] tmp = new int[8];
+        for (int i : DNA) {
+            tmp[i]++;
+        }
+        this.DnaCounter = new DNA(tmp);
         this.Tiredness = tiredness;
         this.representation = new Circle(this.world.getHeight() / this.map.Height / 2, representationColor);
         representation.setStroke(Color.BLACK);
         world.getChildren().add(representation);
-    }
-
-    public Animal(int Energy, Vector2d Position, float tiredness, Pane world, AnimalObserver observer) {
-        this.children = 0;
-        this.observer = observer;
-        this.Energy = Energy;
-        this.Position = Position;
-        this.orientation = MapDirection.NORTH;
-        this.Tiredness = tiredness;
-        int[] DNA = new int[32];
-        Random generator = new Random();
-        for (int i = 0; i < DNA.length; i++) {
-            DNA[i] = generator.nextInt(9);
-        }
-        this.DNA = this.DNACompleteTest(DNA);
     }
 
     // process of recreating new animal witch mixed dna of two parents
@@ -120,7 +111,10 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public void setEnergyColor() {
-        if (isTheChosenOne) {
+        if (this.havingMostPopularDna) {
+            this.representationColor = Color.rgb(255, 191, 0);
+
+        } else if (isTheChosenOne) {
             this.representationColor = Color.rgb(12, 62, 225);
         } else {
             float value = 1 - this.Tiredness;
@@ -232,6 +226,18 @@ public class Animal extends AbstractWorldMapElement {
             result.append(i);
         }
         return result.toString();
+    }
+
+    public DNA getDnaCounter() {
+        return this.DnaCounter;
+    }
+
+    public void setAsPopularAnimal() {
+        this.havingMostPopularDna = true;
+    }
+
+    public void unsetAsPopularAnimal() {
+        this.havingMostPopularDna = false;
     }
 }
 

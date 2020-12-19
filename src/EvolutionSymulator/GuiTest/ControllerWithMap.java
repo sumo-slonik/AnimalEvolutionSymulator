@@ -40,8 +40,6 @@ public class ControllerWithMap {
     int Days;
     int posX;
     int posY;
-    XYChart.Series PopulationSeries;
-    XYChart.Series GrassSeries;
     int[] ArchivalPopulation = new int[100];
     AnimalObserver observer = new AnimalObserver();
     boolean firstTime = true;
@@ -108,21 +106,18 @@ public class ControllerWithMap {
     private CategoryAxis LifeTimeX;
     @FXML
     private NumberAxis LifeTimeY;
-    XYChart.Series LifeTimeSeries;
     @FXML
     private LineChart<?, ?> AverageEnergyChart;
     @FXML
     private CategoryAxis EnergyX;
     @FXML
     private NumberAxis EnergyY;
-    XYChart.Series EnergySeries;
     @FXML
     private LineChart<?, ?> ChildrenChart;
     @FXML
     private CategoryAxis ChildrenX;
     @FXML
     private NumberAxis ChildrenY;
-    XYChart.Series ChildrenSeries;
     @FXML
     TextField Children;
     @FXML
@@ -139,8 +134,14 @@ public class ControllerWithMap {
     @FXML
     TextField AnimalDNA;
     boolean isChange = false;
+    @FXML
+    CheckBox colorMostPopularDNA;
     Map newMap;
     private Movement clock;
+    Chart populationChart;
+    Chart lifeTimeChart;
+    Chart childrenChart;
+    Chart energyChart;
 
     private class Movement extends AnimationTimer {
         private long last = 0;
@@ -159,12 +160,11 @@ public class ControllerWithMap {
     @FXML
     public void initialize() {
         Selected = null;
-        PopulationSeries = new XYChart.Series();
-        PopulationSeries.setName("Zwierzątka");
-        GrassSeries = new XYChart.Series();
-        GrassSeries.setName("Roślinki");
-        Chart populationChart = new Chart(Linechart,x,y,new String[]{"Zwierzątka","Roślinki"},500);
-        world.addEventFilter(MouseEvent.MOUSE_CLICKED,choseAnimalPose);
+        populationChart = new Chart(Linechart, x, y, new String[]{"Zwierzątka", "Roślinki"}, 1000);
+        lifeTimeChart = new Chart(LifeTimeChart, LifeTimeX, LifeTimeY, new String[]{"średnia długość życia"}, 500);
+        childrenChart = new Chart(ChildrenChart, ChildrenX, ChildrenY, new String[]{"średnia liczba dzieci"}, 500);
+        energyChart = new Chart(AverageEnergyChart, EnergyX, EnergyY, new String[]{"średnia poziom energi"}, 500);
+        world.addEventFilter(MouseEvent.MOUSE_CLICKED, choseAnimalPose);
         heightSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
@@ -276,8 +276,8 @@ public class ControllerWithMap {
     }
 
     public void setAnimalNumber() {
-        int proportionToSlider = (int) Math.ceil(animalsSlider.getMax()/(this.newMap.getHeight()*newMap.getWidth()*this.JungleProportion));
-        this.AnimalNumber = (int) animalsSlider.getValue()/proportionToSlider;
+        int proportionToSlider = (int) Math.ceil(animalsSlider.getMax() / (this.newMap.getHeight() * newMap.getWidth() * this.JungleProportion));
+        this.AnimalNumber = (int) animalsSlider.getValue() / proportionToSlider;
         reset();
         animalNumberText.setText("" + this.newMap.getNumberOfAnimals());
         isChange = true;
@@ -293,7 +293,7 @@ public class ControllerWithMap {
     @FXML
     public void reset() {
         stop();
-        chartReset();
+        resetCharts();
         world.getChildren().clear();
         newMap = new Map(world, Height, Width, JungleProportion, JungleProportion, GrassNumber, AnimalNumber, StartEnergy, GrassEnergy, DayEnergy, observer);
         step();
@@ -303,21 +303,24 @@ public class ControllerWithMap {
 
     @FXML
     public void step() {
-        if (observer.getActualPopulation()==0)
+        if (colorMostPopularDNA.isSelected())
         {
+            newMap.findingPopularAnimalDna();
+        }
+        else
+        {
+            newMap.unsetAllAsPopularAnimal();
+        }
+        if (observer.getActualPopulation() == 0) {
             stop();
             return;
         }
-        if (secondMap.isSelected())
-        {
+        if (secondMap.isSelected()) {
             world.setMaxHeight(50);
         }
         drawAnimalStats();
         drawDnaStats();
         drawChart(newMap.getDate());
-        drawChartLifeTime(newMap.getDate());
-        drawChartEnergy(newMap.getDate());
-        drawChartChildren(newMap.getDate());
         if (isChange) {
             isChange = false;
             newMap.changeParameters(DayEnergy, GrassEnergy);
@@ -354,134 +357,84 @@ public class ControllerWithMap {
             posX = (int) event.getX();
             posX = (int) event.getX();
             posY = (int) event.getY();
-            System.out.println(posX+"  "+posY);
-            Selected = newMap.getAnimalAtPosition(getPoseFromPixels(posX,posY));
-            if (Selected != null)
-            {
+            System.out.println(posX + "  " + posY);
+            Selected = newMap.getAnimalAtPosition(getPoseFromPixels(posX, posY));
+            if (Selected != null) {
                 Selected.draw();
                 drawAnimalStats();
                 System.out.println("___________________");
                 System.out.println(Selected.getEnergy());
                 System.out.println("___________________");
-            }
-            else
-            {
+            } else {
                 System.out.println("___________________");
                 System.out.println("fail");
                 System.out.println("___________________");
             }
         }
     };
+
     public void drawDnaStats() {
         DnaStats.getChildren().clear();
         int sum = 1;
-        System.out.println(Arrays.toString(observer.getGenCounter()));
         for (int i : observer.getGenCounter()) {
             sum += i;
         }
         int startX = 0;
         Color[] colorOfDna = new Color[]{Color.GREEN, Color.ROSYBROWN, Color.ROYALBLUE, Color.DARKGREEN, Color.LAVENDER, Color.BURLYWOOD, Color.AQUAMARINE, Color.INDIANRED, Color.CHARTREUSE};
-
         for (int i = 0; i < 9; i++) {
             Rectangle oneDna = new Rectangle(startX, 0, 15, observer.getGenCounter()[i] * 400 / sum);
-            oneDna.setFill(Color.rgb(Math.min(Math.round(252*((float)observer.getGenCounter()[i]/sum))*8,252),Math.min(Math.round(50*((float)observer.getGenCounter()[i]/sum))*8,50),Math.min(Math.round(100*((float)observer.getGenCounter()[i]/sum))*8,100)));
+            oneDna.setFill(Color.rgb(Math.min(Math.round(252 * ((float) observer.getGenCounter()[i] / sum)) * 8, 252), Math.min(Math.round(50 * ((float) observer.getGenCounter()[i] / sum)) * 8, 50), Math.min(Math.round(100 * ((float) observer.getGenCounter()[i] / sum)) * 8, 100)));
             DnaStats.getChildren().add(oneDna);
             startX += 25;
         }
     }
-    public void drawChart(Integer date) {
-        if (date % 1000 == 0) {
-            Linechart.getData().clear();
-            PopulationSeries = new XYChart.Series();
-            PopulationSeries.setName("Zwierzątka");
-            GrassSeries = new XYChart.Series();
-            GrassSeries.setName("Roślinki");
-            Linechart.getData().add(PopulationSeries);
-            Linechart.getData().add(GrassSeries);
-        }
-        if (date % 50 == 0) {
-            Linechart.getData().get(0).getData().add(new XYChart.Data(date.toString(), observer.getActualPopulation()));
-            Linechart.getData().get(1).getData().add(new XYChart.Data(date.toString(), newMap.Grasses.size()));
-        }
-    }
-    public void drawChartLifeTime(Integer date) {
-        if (date % 500 == 0) {
-            LifeTimeChart.getData().clear();
-            LifeTimeSeries = new XYChart.Series();
-            LifeTimeSeries.setName("średnia długość życia");
-            LifeTimeChart.getData().add(LifeTimeSeries);
-        }
-        if (date % 50 == 0) {
-            LifeTimeChart.getData().get(0).getData().add(new XYChart.Data(date.toString(), observer.getAverageLifeTime()));
-        }
-    }
-        public void drawChartEnergy(Integer date) {
-            if (date % 500 == 0) {
-                AverageEnergyChart.getData().clear();
-                EnergySeries = new XYChart.Series();
-                EnergySeries.setName("średnia długość życia");
-                AverageEnergyChart.getData().add(EnergySeries);
-            }
-            if (date % 50 == 0) {
-                AverageEnergyChart.getData().get(0).getData().add(new XYChart.Data(date.toString(), observer.getAverageEnergy()));
-            }
-        }
-            public void drawChartChildren(Integer date) {
-                if (date % 500 == 0) {
-                    ChildrenChart.getData().clear();
-                    ChildrenSeries = new XYChart.Series();
-                    ChildrenSeries.setName("średnia długość życia");
-                    ChildrenChart.getData().add(ChildrenSeries);
-                }
-                if (date % 50 == 0) {
-                    ChildrenChart.getData().get(0).getData().add(new XYChart.Data(date.toString(), observer.getAverageChildren()));
-                }
-            }
-            public void chartReset()
-            {
-                ChildrenChart.getData().clear();
-                ChildrenSeries = new XYChart.Series();
-                ChildrenSeries.setName("średnia długość życia");
-                ChildrenChart.getData().add(ChildrenSeries);
-                AverageEnergyChart.getData().clear();
-                EnergySeries = new XYChart.Series();
-                EnergySeries.setName("średnia długość życia");
-                AverageEnergyChart.getData().add(EnergySeries);
-                LifeTimeChart.getData().clear();
-                LifeTimeSeries = new XYChart.Series();
-                LifeTimeSeries.setName("średnia długość życia");
-                LifeTimeChart.getData().add(LifeTimeSeries);
-            }
-            public Vector2d getPoseFromPixels(int x,int y)
-            {
-                int rectangleSizeX = (int) this.world.getWidth()/newMap.getWidth();
-                int rectangleSizeY = (int) this.world.getHeight()/newMap.getHeight();
-                return new Vector2d(x/rectangleSizeX,y/rectangleSizeY-1);
-            }
-            public void drawAnimalStats()
-            {
-                if (Selected!=null)
-                {
-                    Children.setText(""+Selected.getChildren());
-                    BirthDay.setText(""+Selected.getBirthDay());
-                    Rectangle energy;
-                    if (Selected.isDeath())
-                    {
-                        DedDay.setText("" + Selected.getDeathDate());
-                        energy = new Rectangle(10,10,0,20);
 
-                    }
-                    else {
-                        if (Selected.getTiredness()<0.5){DedDay.setText("Mam się dobrze");}
-                        else {DedDay.setText("Mam się średnio, ale żyję");}
-                        energy = new Rectangle(10,10,(int)125*(1-Selected.getTiredness()),20);
-                    }
-                    AnimalEnergyPrompt.setText(""+(int)(((1-Selected.getTiredness())*100)%100)+"%");
-                    AnimalEnergy.getChildren().clear();
-                    energy.setFill(Color.rgb(Math.round(255*(Selected.getTiredness())),Math.round(222*(1-this.Selected.getTiredness())),50));
-                    AnimalEnergy.getChildren().add(energy);
-                    AnimalDNA.setText(Selected.getDnaAsString());
-                }
-            }
+    public void drawChart(Integer date) {
+        if (date % 50 == 0) {
+            populationChart.addData(new String[]{date.toString(), date.toString()}, new Integer[]{observer.getActualPopulation(), newMap.Grasses.size()});
+            lifeTimeChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageLifeTime()});
+            childrenChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageChildren()});
+            energyChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageEnergy()});
+            System.out.println(observer.getAverageLifeTime());
+        }
     }
+
+    public void resetCharts() {
+        populationChart.clear();
+        lifeTimeChart.clear();
+        childrenChart.clear();
+        energyChart.clear();
+    }
+
+    public Vector2d getPoseFromPixels(int x, int y) {
+        int rectangleSizeX = (int) this.world.getWidth() / newMap.getWidth();
+        int rectangleSizeY = (int) this.world.getHeight() / newMap.getHeight();
+        return new Vector2d(x / rectangleSizeX, y / rectangleSizeY - 1);
+    }
+
+    public void drawAnimalStats() {
+        if (Selected != null) {
+            Children.setText("" + Selected.getChildren());
+            BirthDay.setText("" + Selected.getBirthDay());
+            Rectangle energy;
+            if (Selected.isDeath()) {
+                DedDay.setText("" + Selected.getDeathDate());
+                energy = new Rectangle(10, 10, 0, 20);
+
+            } else {
+                if (Selected.getTiredness() < 0.5) {
+                    DedDay.setText("Mam się dobrze");
+                } else {
+                    DedDay.setText("Mam się średnio, ale żyję");
+                }
+                energy = new Rectangle(10, 10, (int) 125 * (1 - Selected.getTiredness()), 20);
+            }
+            AnimalEnergyPrompt.setText("" + (int) (((1 - Selected.getTiredness()) * 100) % 100) + "%");
+            AnimalEnergy.getChildren().clear();
+            energy.setFill(Color.rgb(Math.round(255 * (Selected.getTiredness())), Math.round(222 * (1 - this.Selected.getTiredness())), 50));
+            AnimalEnergy.getChildren().add(energy);
+            AnimalDNA.setText(Selected.getDnaAsString());
+        }
+    }
+}
 
