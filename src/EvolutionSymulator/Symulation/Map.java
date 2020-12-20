@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Map {
-
     private final int defaultEnergy;
     int Height;
     int Width;
@@ -32,12 +31,15 @@ public class Map {
     //zbiór traw na mapie
     public java.util.Map<Vector2d, Grass> Grasses = new HashMap<>();
     AnimalObserver Observer;
+    SelectedAnimalObserver SelectedObserver;
     Integer ActualDay;
     HashMap<DNA,Integer> genomes;
 
     public Map(Pane world, int height, int width, float jungleHeight, float jungleWidth, int numberOfGrass, int numberOfAnimals, int defaultEnergy, int GrassEnergy,int oneDayCost,AnimalObserver observer) {
+
         //obserwator śledzący parametry zwierząt
         this.Observer = observer;
+        this.SelectedObserver = new SelectedAnimalObserver();
         this.Observer.reset();
         //ustalenie parametrów startowych zgodnie z wejściem od urztkownika
         this.ActualDay =0;
@@ -67,7 +69,6 @@ public class Map {
         //Dodanie połowy traw startowych w dżungli i drugiej połowy na całej mapie
         spawnGrass(numberOfGrass / 2, this.LeftBottomCorner, this.RightTopCorner);
         spawnGrass(numberOfGrass / 2, LeftBottomCornerJungle, RightTopCornerJungle);
-
     }
 
     //funckja tworząca nowe zwierząta
@@ -343,12 +344,21 @@ public class Map {
         {
             if (this.Animals.get(pose.add(new Vector2d(dx[i],dy[i])))!= null)
             {
+                if (this.Animals.get(pose.add(new Vector2d(dx[i],dy[i]))).get(0).equals(this.Selected))
+                {
+                    this.Selected.selectionType = SelectionType.Unselected;
+                    this.Selected.draw();
+                    this.Selected = null;
+                    clearAllSelection();
+                    return null;
+                }
                 if (this.Selected != null)
                 {
-                    this.Selected.isTheChosenOne = false;
+                    this.Selected.selectionType = SelectionType.Unselected;
+                    clearAllSelection();
                     this.Selected.draw();
                 }
-                this.Animals.get(pose.add(new Vector2d(dx[i],dy[i]))).get(0).isTheChosenOne = true;
+                this.Animals.get(pose.add(new Vector2d(dx[i],dy[i]))).get(0).selectionType = SelectionType.Selected;
                 this.Selected = this.Animals.get(pose.add(new Vector2d(dx[i],dy[i]))).get(0);
                 return this.Animals.get(pose.add(new Vector2d(dx[i],dy[i]))).get(0);
             }
@@ -401,12 +411,26 @@ public class Map {
                 actual.setAsPopularAnimal();
             }
         }
-
-
+    }
+    void clearAllSelection()
+    {
+        this.SelectedObserver.reset();
+        ArrayList<Animal> Animals = new ArrayList<>();
+        for (ArrayList<Animal> animals : this.Animals.values()) {
+            Animals.addAll(animals);
+        }
+        for (Animal actual: Animals)
+        {
+            actual.selectionType = SelectionType.Unselected;
+        }
     }
     //zwracanie konkretnych wartości mapy
     public int getWidth() {return this.Width;}
     public int getHeight(){return this.Height;}
     public Animal getSelected(){ return this.Selected; }
     public int getNumberOfAnimals() {return this.Observer.actualPopulation;}
+    public SelectedAnimalObserver getSelectedObserver()
+    {
+        return this.SelectedObserver;
+    }
 }

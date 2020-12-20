@@ -5,8 +5,9 @@ package Symulation;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Animal extends AbstractWorldMapElement {
@@ -33,8 +34,12 @@ public class Animal extends AbstractWorldMapElement {
     boolean isTheChosenOne;
     boolean havingMostPopularDna;
     DNA DnaCounter;
-
+    Long Id;
+    SelectionType selectionType;
     public Animal(int Energy, Vector2d Position, int[] DNA, float tiredness, Pane world, Map map, AnimalObserver observer) {
+
+        //Początkowo zwierze ustaiwamy jako nie wybrane
+        this.selectionType = SelectionType.Unselected;
         this.death = false;
         this.isTheChosenOne = false;
         this.children = 0;
@@ -84,6 +89,14 @@ public class Animal extends AbstractWorldMapElement {
         this.Tiredness += 0.25;
         secondParent.Tiredness += 0.25;
         Animal child = new Animal(this.Energy, this.Position.add(spawnDirection.toOneStepVector()), ChildDNA, (float) 0.5, this.world, this.map, this.observer);
+        if (this.selectionType == SelectionType.Selected || secondParent.selectionType==SelectionType.Selected)
+        {
+            child.selectionType = SelectionType.ChildrenOfSelected;
+        }
+        else if (this.selectionType == SelectionType.ChildrenOfSelected || secondParent.selectionType==SelectionType.ChildrenOfSelected || this.selectionType == SelectionType.DescendantsOfSelected || secondParent.selectionType==SelectionType.DescendantsOfSelected)
+        {
+            child.selectionType = SelectionType.DescendantsOfSelected;
+        }
         child.born(this.map.ActualDay);
         return child;
     }
@@ -111,14 +124,19 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public void setEnergyColor() {
-        if (this.havingMostPopularDna) {
-            this.representationColor = Color.rgb(255, 191, 0);
-
-        } else if (isTheChosenOne) {
-            this.representationColor = Color.rgb(12, 62, 225);
-        } else {
-            float value = 1 - this.Tiredness;
-            this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
+        switch (this.selectionType)
+        {
+            case Selected -> this.representationColor = Color.rgb(12, 62, 225);
+            case ChildrenOfSelected -> this.representationColor = Color.rgb(103, 0, 103);
+            case DescendantsOfSelected -> this.representationColor = Color.rgb(255, 0, 255);
+            case Unselected -> {
+                if (this.havingMostPopularDna) {
+                    this.representationColor = Color.rgb(255, 191, 0);
+                } else {
+                    float value = 1 - this.Tiredness;
+                    this.representationColor = Color.rgb(Math.round(value * 255), Math.round(value * 50), 0);
+                }
+            }
         }
     }
 
@@ -188,12 +206,28 @@ public class Animal extends AbstractWorldMapElement {
             this.deathDate = actualDay;
         }
         observer.animalKill(this, actualDay);
+        if (this.selectionType == SelectionType.ChildrenOfSelected)
+        {
+            this.map.SelectedObserver.killChild();
+        }
+        if (this.selectionType == SelectionType.DescendantsOfSelected)
+        {
+            this.map.SelectedObserver.killDescendants();
+        }
     }
 
     public void born(int actualDay) {
         this.birthDay = actualDay;
         observer.animalSpawn(this);
-
+        this.Id =(long) observer.getActualPopulation()*13*birthDay*17389;
+        if (this.selectionType == SelectionType.ChildrenOfSelected)
+        {
+            this.map.SelectedObserver.addChild();
+        }
+        if (this.selectionType == SelectionType.DescendantsOfSelected)
+        {
+            this.map.SelectedObserver.addDescendants();
+        }
     }
 
     public int getAge(int actualDay) {
@@ -211,15 +245,12 @@ public class Animal extends AbstractWorldMapElement {
     public void addChildren() {
         this.children++;
     }
-
     public boolean isDeath() {
         return this.death;
     }
-
     public int getDeathDate() {
         return this.deathDate;
     }
-
     public String getDnaAsString() {
         StringBuilder result = new StringBuilder();
         for (int i : this.DNA) {
@@ -238,6 +269,23 @@ public class Animal extends AbstractWorldMapElement {
 
     public void unsetAsPopularAnimal() {
         this.havingMostPopularDna = false;
+    }
+    @Override
+    public int hashCode()
+    {
+        return this.Id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return this.Id == ((Animal) o).getId();
+    }
+    public long getId()
+    {
+        return this.Id;
     }
 }
 

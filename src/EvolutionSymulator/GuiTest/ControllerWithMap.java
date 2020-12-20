@@ -43,7 +43,7 @@ public class ControllerWithMap {
     int Days;
     int posX;
     int posY;
-    boolean isFirstTime=true;
+    boolean isFirstTime = true;
     boolean isSecondMapOnScreen = false;
     int[] ArchivalPopulation = new int[100];
     AnimalObserver observer = new AnimalObserver();
@@ -152,6 +152,14 @@ public class ControllerWithMap {
     Pane secondWorld;
     @FXML
     Button saveButton;
+    @FXML
+    TextField SelectAnimalLivingChildren;
+    @FXML
+    TextField SelectAnimalAllChildren;
+    @FXML
+    TextField SelectAnimalLivingDescendants;
+    @FXML
+    TextField SelectAnimalAllDescendants;
     Map newMap;
     Map secMap;
     private Movement1 clock;
@@ -174,6 +182,7 @@ public class ControllerWithMap {
             }
         }
     }
+
     private class Movement2 extends AnimationTimer {
         private long last = 0;
 
@@ -371,10 +380,9 @@ public class ControllerWithMap {
 
     @FXML
     public void start() {
-        if (isFirstTime)
-        {
+        if (isFirstTime) {
             reset();
-            isFirstTime=false;
+            isFirstTime = false;
         }
         disableButtons(true, false, false);
         clock.start();
@@ -442,8 +450,8 @@ public class ControllerWithMap {
     }
 
     public Vector2d getPoseFromPixels(int x, int y) {
-        int XCoordinate = (int) (x/this.world.getWidth()*newMap.getWidth());
-        int YCoordinate = (int) (y/this.world.getHeight()*newMap.getHeight());
+        int XCoordinate = (int) (x / this.world.getWidth() * newMap.getWidth());
+        int YCoordinate = (int) (y / this.world.getHeight() * newMap.getHeight());
         return new Vector2d(XCoordinate, YCoordinate);
     }
 
@@ -469,10 +477,14 @@ public class ControllerWithMap {
             energy.setFill(Color.rgb(Math.round(255 * (Selected.getTiredness())), Math.round(222 * (1 - this.Selected.getTiredness())), 50));
             AnimalEnergy.getChildren().add(energy);
             AnimalDNA.setText(Selected.getDnaAsString());
+            SelectAnimalLivingChildren.setText(""+newMap.getSelectedObserver().getNumberOfLivingChildren());
+            SelectAnimalLivingDescendants.setText(""+newMap.getSelectedObserver().getNumberOfLivingDescendants());
+            SelectAnimalAllChildren.setText(""+newMap.getSelectedObserver().getAllNewChildren());
+            SelectAnimalAllDescendants.setText(""+newMap.getSelectedObserver().getAllNewDescendants());
         }
     }
-    public void showSecondMap()
-    {
+
+    public void showSecondMap() {
         isSecondMapOnScreen = true;
         stop();
         secondMapReset();
@@ -488,8 +500,8 @@ public class ControllerWithMap {
         secondStop.setPrefHeight(25);
         secondReset.setPrefHeight(25);
     }
-    public void hideSecondMap()
-    {
+
+    public void hideSecondMap() {
         isSecondMapOnScreen = false;
         secondMapReset();
         stop();
@@ -504,28 +516,25 @@ public class ControllerWithMap {
         world.setMaxHeight(736);
         world.setMinHeight(736);
     }
-    public void secondMap(){
-        if (secondMap.isSelected() && !isSecondMapOnScreen)
-        {
+
+    public void secondMap() {
+        if (secondMap.isSelected() && !isSecondMapOnScreen) {
             showSecondMap();
-        }else if(!secondMap.isSelected()&& isSecondMapOnScreen)
-        {
+        } else if (!secondMap.isSelected() && isSecondMapOnScreen) {
             hideSecondMap();
         }
-        isFirstTime=true;
+        isFirstTime = true;
     }
-    public void ColorPopularDNA()
-    {
-        if (colorMostPopularDNA.isSelected())
-        {
+
+    public void ColorPopularDNA() {
+        if (colorMostPopularDNA.isSelected()) {
             newMap.findingPopularAnimalDna();
-        }
-        else
-        {
+        } else {
             newMap.unsetAllAsPopularAnimal();
         }
         newMap.draw();
     }
+
     @FXML
     public void secondMapStep() {
         if (isChange) {
@@ -535,12 +544,12 @@ public class ControllerWithMap {
         secMap.oneDayPass();
         secMap.draw();
     }
+
     @FXML
     public void secondMapStart() {
-        if (isFirstTime)
-        {
+        if (isFirstTime) {
             secondMapReset();
-            isFirstTime=false;
+            isFirstTime = false;
         }
         secondMapClock.start();
     }
@@ -549,6 +558,7 @@ public class ControllerWithMap {
     public void secondMapStop() {
         secondMapClock.stop();
     }
+
     @FXML
     public void secondMapReset() {
         secondMapStop();
@@ -556,6 +566,7 @@ public class ControllerWithMap {
         secMap = new Map(secondWorld, Height, Width, JungleProportion, JungleProportion, GrassNumber, AnimalNumber, StartEnergy, GrassEnergy, DayEnergy, SecondMapObserver);
         secMap.draw();
     }
+
     @FXML
     public void saveStatsToTxt() throws FileNotFoundException {
         StatsToTxtSaver saver = new StatsToTxtSaver();

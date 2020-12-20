@@ -160,7 +160,7 @@
                                     <Insets left="7.0" />
                                  </VBox.margin>
                               </Label>
-                              <Slider fx:id="dayEnergySlider" majorTickUnit="1.0" max="50.0" min="1.0" value="4.0">
+                              <Slider fx:id="dayEnergySlider" majorTickUnit="1.0" max="50.0" min="1.0" value="5.0">
                                  <VBox.margin>
                                     <Insets left="7.0" />
                                  </VBox.margin>
@@ -233,7 +233,7 @@
                                     <Insets bottom="5.0" top="10.0" />
                                  </VBox.margin>
                               </TextField>
-                              <TextField fx:id="dayEnergyText" disable="true" prefHeight="26.0" prefWidth="46.0">
+                              <TextField fx:id="dayEnergyText" disable="true" prefHeight="26.0" prefWidth="46.0" text="5">
                                  <opaqueInsets>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </opaqueInsets>
@@ -300,26 +300,83 @@
                                     </VBox>
                                     <VBox prefHeight="200.0" prefWidth="100.0">
                                        <children>
-                                          <Pane prefHeight="88.0" prefWidth="35.0" />
                                           <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/zwierzak.png" />
                                              </image>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
                                           </ImageView>
-                                          <Pane prefHeight="33.0" prefWidth="35.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/wybrany.png" />
+                                             </image>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </ImageView>
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/dziecko%20wybranego.png" />
+                                             </image>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </ImageView>
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/potomek.png" />
+                                             </image>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </ImageView>
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/popularny.png" />
+                                             </image>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </ImageView>
                                           <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GuiTest/Images/roślinka.jpg" />
                                              </image>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
                                           </ImageView>
                                        </children>
                                     </VBox>
                                     <VBox prefHeight="200.0" prefWidth="100.0">
                                        <children>
-                                          <Pane prefHeight="95.0" prefWidth="41.0" />
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zwierze" wrappingWidth="40.5703125" />
-                                          <Pane prefHeight="59.0" prefWidth="41.0" />
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Roślina" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zwykłe zwierze" wrappingWidth="40.5703125" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zaznaczone zwierze" wrappingWidth="64.77732849121094">
+                                             <VBox.margin>
+                                                <Insets top="15.0" />
+                                             </VBox.margin></Text>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dziecko zaznaczonego" wrappingWidth="75.77032852172852">
+                                             <VBox.margin>
+                                                <Insets top="12.0" />
+                                             </VBox.margin>
+                                          </Text>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Potomek zaznaczonego" wrappingWidth="76.57031631469727">
+                                             <VBox.margin>
+                                                <Insets top="13.0" />
+                                             </VBox.margin>
+                                          </Text>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Z popularnym genomem" wrappingWidth="75.77029800415039">
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </Text>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Roślinka" wrappingWidth="75.77029800415039">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Text>
                                        </children>
                                     </VBox>
                                  </children>
@@ -387,7 +444,7 @@
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Wybrane do podglądu zwierzątko">
                                        <font>
-                                          <Font size="23.0" />
+                                          <Font size="22.0" />
                                        </font>
                                     </Text>
                                  </children></HBox>
@@ -399,7 +456,7 @@
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Energia">
                                                    <font>
-                                                      <Font size="30.0" />
+                                                      <Font size="22.0" />
                                                    </font>
                                                 </Text>
                                                 <Pane fx:id="AnimalEnergy" prefHeight="54.0" prefWidth="143.0" />
@@ -407,6 +464,9 @@
                                                    <font>
                                                       <Font size="25.0" />
                                                    </font>
+                                                   <HBox.margin>
+                                                      <Insets left="40.0" />
+                                                   </HBox.margin>
                                                 </TextField>
                                              </children>
                                           </HBox>
@@ -414,12 +474,12 @@
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Liczba Dzieci">
                                                    <font>
-                                                      <Font size="30.0" />
+                                                      <Font size="22.0" />
                                                    </font>
                                                 </Text>
                                                 <TextField fx:id="Children" alignment="CENTER_RIGHT" disable="true">
                                                    <HBox.margin>
-                                                      <Insets left="15.0" />
+                                                      <Insets left="85.0" />
                                                    </HBox.margin>
                                                 </TextField>
                                              </children>
@@ -428,38 +488,68 @@
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dzień urodzenia">
                                                    <font>
-                                                      <Font size="30.0" />
+                                                      <Font size="22.0" />
                                                    </font>
                                                 </Text>
-                                                <TextField fx:id="BirthDay" alignment="CENTER_RIGHT" disable="true" />
+                                                <TextField fx:id="BirthDay" alignment="CENTER_RIGHT" disable="true">
+                                                   <HBox.margin>
+                                                      <Insets left="50.0" />
+                                                   </HBox.margin></TextField>
                                              </children>
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dzień śmierci">
                                                    <font>
-                                                      <Font size="30.0" />
+                                                      <Font size="22.0" />
                                                    </font>
                                                 </Text>
                                                 <TextField fx:id="DedDay" alignment="CENTER_RIGHT" disable="true">
                                                    <HBox.margin>
-                                                      <Insets left="15.0" />
+                                                      <Insets left="75.0" />
                                                    </HBox.margin>
                                                 </TextField>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="49.0" prefWidth="344.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DNA">
                                                    <font>
-                                                      <Font size="30.0" />
+                                                      <Font size="22.0" />
                                                    </font>
                                                 </Text>
                                                 <TextField fx:id="AnimalDNA" disable="true" prefHeight="46.0" prefWidth="274.0">
                                                    <font>
                                                       <Font size="13.0" />
                                                    </font>
+                                                   <HBox.margin>
+                                                      <Insets left="35.0" />
+                                                   </HBox.margin>
                                                 </TextField>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dzieci od rozpoczęcia obserwacji">
+                                                   <font>
+                                                      <Font size="22.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets top="50.0" />
+                                                   </HBox.margin>
+                                                </Text>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Potomkowie od rozpoczęcia obserwacji">
+                                                   <font>
+                                                      <Font size="22.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets top="25.0" />
+                                                   </HBox.margin>
+                                                </Text>
                                              </children>
                                           </HBox>
                                        </children>
@@ -481,6 +571,46 @@
                                     </ImageView>
                                  </children></HBox>
                               <HBox prefHeight="100.0" prefWidth="200.0" />
+                              <VBox prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Pane prefHeight="114.0" prefWidth="138.0">
+                                       <children>
+                                          <HBox alignment="BOTTOM_LEFT" layoutX="-8.0" layoutY="13.0" prefHeight="55.0" prefWidth="147.0">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Żyjące     ">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" />
+                                                   </HBox.margin>
+                                                </Text>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="W sumie">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets bottom="5.0" />
+                                                   </HBox.margin>
+                                                </Text>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </Pane>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <TextField fx:id="SelectAnimalLivingChildren" disable="true" editable="false" prefHeight="42.0" prefWidth="70.0" />
+                                          <TextField fx:id="SelectAnimalAllChildren" disable="true" editable="false" prefHeight="42.0" prefWidth="70.0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <TextField fx:id="SelectAnimalLivingDescendants" disable="true" editable="false" prefHeight="42.0" prefWidth="70.0" />
+                                          <TextField fx:id="SelectAnimalAllDescendants" disable="true" editable="false" prefHeight="42.0" prefWidth="70.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
                            </children>
                         </VBox>
                      </children>
