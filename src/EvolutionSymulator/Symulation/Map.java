@@ -4,10 +4,12 @@ package Symulation;
 //odpowiada też za ich przemieszczanie, rozmnażanie oraz ryuswoanie
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Map {
@@ -67,7 +69,7 @@ public class Map {
         //dodanie zwierząt
         spawnAnimals(numberOfAnimals);
         //Dodanie połowy traw startowych w dżungli i drugiej połowy na całej mapie
-        spawnGrass(numberOfGrass / 2, this.LeftBottomCorner, this.RightTopCorner);
+        outOfJungleGrassSpawn(numberOfGrass/2);
         spawnGrass(numberOfGrass / 2, LeftBottomCornerJungle, RightTopCornerJungle);
     }
 
@@ -152,10 +154,29 @@ public class Map {
             }
         }
     }
+    public void outOfJungleGrassSpawn(int numberOfGrass)
+    {
+        Vector2d I = new Vector2d(this.LeftBottomCornerJungle.x, RightTopCorner.y);
+        Vector2d II = new Vector2d(this.LeftBottomCornerJungle.x, RightTopCornerJungle.y);
+        Vector2d III = new Vector2d(this.LeftBottomCornerJungle.x, this.LeftBottomCorner.y);
+        Vector2d IV = new Vector2d(this.RightTopCornerJungle.x, this.LeftBottomCornerJungle.y);
+        Vector2d V = new Vector2d(this.RightTopCornerJungle.x, this.RightTopCorner.y);
+        Vector2d VI = new Vector2d(this.RightTopCornerJungle.x, this.LeftBottomCorner.y);
+        Random generator = new Random();
+
+        for (int i =0;i<numberOfGrass;i++) {
+            switch (generator.nextInt(8)) {
+                case 0,1,2 -> spawnGrass(1, this.LeftBottomCorner, I);
+                case 3 -> spawnGrass(1, III, IV);
+                case 4 -> spawnGrass(1, II, V);
+                case 5,6,7 -> spawnGrass(1, VI, this.RightTopCorner);
+            }
+        }
+    }
     //funckcja obsługująca codzienne wyrastanie traw
     public void dailyGrassSpawn() {
-        spawnGrass(1, this.LeftBottomCorner, this.RightTopCorner);
         spawnGrass(1, this.LeftBottomCornerJungle, this.RightTopCornerJungle);
+        outOfJungleGrassSpawn(1);
     }
     //sprawdzenie czy na danej pozycji jest trawa
     public boolean isOccupiedByGrass(Vector2d position) {
@@ -214,14 +235,13 @@ public class Map {
             Animals.addAll(animals);
         }
         for (Animal actual : Animals) {
-            if (actual.getEnergy() < this.OneDayCost) {
+            if (actual.getEnergy() <= this.OneDayCost) {
                 actual.kill(this.ActualDay);
                 if (this.Animals.get(actual.getPosition()).size() == 1) {
                     this.Animals.remove(actual.getPosition());
                 } else {
                     this.Animals.get(actual.getPosition()).remove(actual);
                 }
-                this.World.getChildren().remove(actual.representation);
             }
         }
     }
@@ -313,8 +333,8 @@ public class Map {
     }
     //funckja odpowiadająca za upływ jednego dnia
     public void oneDayPass() {
-        dailyGrassSpawn();
         reaper();
+        dailyGrassSpawn();
         moveAll();
         eating();
         reproduction();

@@ -22,6 +22,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
@@ -50,6 +51,8 @@ public class ControllerWithMap {
     AnimalObserver SecondMapObserver = new AnimalObserver();
     boolean firstTime = true;
     public static long FPS = 30L;
+    @FXML
+    TextField AnimalId;
     @FXML
     Slider fpsSlider;
     @FXML
@@ -168,6 +171,7 @@ public class ControllerWithMap {
     Chart lifeTimeChart;
     Chart childrenChart;
     Chart energyChart;
+    Circle circle = new Circle();
 
     private class Movement1 extends AnimationTimer {
         private long last = 0;
@@ -325,7 +329,6 @@ public class ControllerWithMap {
         this.AnimalNumber = (int) animalsSlider.getValue() / proportionToSlider;
         reset();
         secondMapReset();
-
         animalNumberText.setText("" + this.newMap.getNumberOfAnimals());
         isChange = true;
     }
@@ -333,7 +336,6 @@ public class ControllerWithMap {
     public void setGrassNumber() {
         reset();
         secondMapReset();
-
         this.GrassNumber = (int) grassSlider.getValue();
         grassNumberText.setText("" + newMap.Grasses.size());
         isChange = true;
@@ -347,19 +349,26 @@ public class ControllerWithMap {
         colorMostPopularDNA.setSelected(false);
         newMap = new Map(world, Height, Width, JungleProportion, JungleProportion, GrassNumber, AnimalNumber, StartEnergy, GrassEnergy, DayEnergy, observer);
         Days = 0;
-        daysText.setText("" + Days);
         newMap.draw();
+        drawChart(0);
+        NumberOfAnimals.setText("" + observer.getActualPopulation());
+        NumberOfDedAnimals.setText("" + observer.getDedPopulation());
+        daysText.setText("" + Days);
     }
-
     @FXML
     public void step() {
         if (observer.getActualPopulation() == 0) {
+            //na przypadki szczególne
+            NumberOfAnimals.setText("0");
             stop();
             return;
         }
+        else
+        {
+            drawDnaStats();
+            drawChart(newMap.getDate());
+        }
         drawAnimalStats();
-        drawDnaStats();
-        drawChart(newMap.getDate());
         if (isChange) {
             isChange = false;
             newMap.changeParameters(DayEnergy, GrassEnergy);
@@ -425,8 +434,8 @@ public class ControllerWithMap {
         int startX = 0;
         Color[] colorOfDna = new Color[]{Color.GREEN, Color.ROSYBROWN, Color.ROYALBLUE, Color.DARKGREEN, Color.LAVENDER, Color.BURLYWOOD, Color.AQUAMARINE, Color.INDIANRED, Color.CHARTREUSE};
         for (int i = 0; i < 9; i++) {
-            Rectangle oneDna = new Rectangle(startX, 0, 15, observer.getGenCounter()[i] * 400 / sum);
-            oneDna.setFill(Color.rgb(Math.min(Math.round(252 * ((float) observer.getGenCounter()[i] / sum)) * 8, 252), Math.min(Math.round(50 * ((float) observer.getGenCounter()[i] / sum)) * 8, 50), Math.min(Math.round(100 * ((float) observer.getGenCounter()[i] / sum)) * 8, 100)));
+            Rectangle oneDna = new Rectangle(startX, 0, 15, Math.min((float) observer.getGenCounter()[i] * 400 / sum, (float) 200));
+            oneDna.setFill(Color.rgb(Math.min(Math.round(252 * ((float) Math.abs(observer.getGenCounter()[i]) / Math.abs(sum))) * 8, 252), Math.min(Math.round(50 * ((float) Math.abs(observer.getGenCounter()[i]) / Math.abs(sum))) * 8, 50), Math.min(Math.round(100 * ((float) Math.abs(observer.getGenCounter()[i]) / Math.abs(sum))) * 8, 100)));
             DnaStats.getChildren().add(oneDna);
             startX += 25;
         }
@@ -438,7 +447,6 @@ public class ControllerWithMap {
             lifeTimeChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageLifeTime()});
             childrenChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageChildren()});
             energyChart.addData(new String[]{date.toString()}, new Float[]{observer.getAverageEnergy()});
-            System.out.println(observer.getAverageLifeTime());
         }
     }
 
@@ -457,6 +465,7 @@ public class ControllerWithMap {
 
     public void drawAnimalStats() {
         if (Selected != null) {
+            AnimalId.setText(""+Selected.getId());
             Children.setText("" + Selected.getChildren());
             BirthDay.setText("" + Selected.getBirthDay());
             Rectangle energy;
@@ -477,10 +486,10 @@ public class ControllerWithMap {
             energy.setFill(Color.rgb(Math.round(255 * (Selected.getTiredness())), Math.round(222 * (1 - this.Selected.getTiredness())), 50));
             AnimalEnergy.getChildren().add(energy);
             AnimalDNA.setText(Selected.getDnaAsString());
-            SelectAnimalLivingChildren.setText(""+newMap.getSelectedObserver().getNumberOfLivingChildren());
-            SelectAnimalLivingDescendants.setText(""+newMap.getSelectedObserver().getNumberOfLivingDescendants());
-            SelectAnimalAllChildren.setText(""+newMap.getSelectedObserver().getAllNewChildren());
-            SelectAnimalAllDescendants.setText(""+newMap.getSelectedObserver().getAllNewDescendants());
+            SelectAnimalLivingChildren.setText("" + newMap.getSelectedObserver().getNumberOfLivingChildren());
+            SelectAnimalLivingDescendants.setText("" + newMap.getSelectedObserver().getNumberOfLivingDescendants());
+            SelectAnimalAllChildren.setText("" + newMap.getSelectedObserver().getAllNewChildren());
+            SelectAnimalAllDescendants.setText("" + newMap.getSelectedObserver().getAllNewDescendants());
         }
     }
 
