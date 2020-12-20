@@ -15,6 +15,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -23,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ public class ControllerWithMap {
     boolean isSecondMapOnScreen = false;
     int[] ArchivalPopulation = new int[100];
     AnimalObserver observer = new AnimalObserver();
+    AnimalObserver SecondMapObserver = new AnimalObserver();
     boolean firstTime = true;
     public static long FPS = 30L;
     @FXML
@@ -146,15 +150,18 @@ public class ControllerWithMap {
     Button secondReset;
     @FXML
     Pane secondWorld;
-
+    @FXML
+    Button saveButton;
     Map newMap;
-    private Movement clock;
+    Map secMap;
+    private Movement1 clock;
+    private Movement2 secondMapClock;
     Chart populationChart;
     Chart lifeTimeChart;
     Chart childrenChart;
     Chart energyChart;
 
-    private class Movement extends AnimationTimer {
+    private class Movement1 extends AnimationTimer {
         private long last = 0;
 
         @Override
@@ -163,6 +170,19 @@ public class ControllerWithMap {
             long interval = 1000000000L / framesPerSecond;
             if (now - last > interval) {
                 step();
+                last = now;
+            }
+        }
+    }
+    private class Movement2 extends AnimationTimer {
+        private long last = 0;
+
+        @Override
+        public void handle(long now) {
+            long framesPerSecond = FPS;
+            long interval = 1000000000L / framesPerSecond;
+            if (now - last > interval) {
+                secondMapStep();
                 last = now;
             }
         }
@@ -230,7 +250,8 @@ public class ControllerWithMap {
                 setGrassNumber();
             }
         });
-        clock = new Movement();
+        clock = new Movement1();
+        secondMapClock = new Movement2();
         world.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
         setHeight();
         setWidth();
@@ -241,6 +262,7 @@ public class ControllerWithMap {
         setJungleProportion();
         setStartEnergy();
         reset();
+        secondMapReset();
         dayEnergyText.setText("0");
     }
 
@@ -258,10 +280,12 @@ public class ControllerWithMap {
         this.Width = (int) widthSlider.getValue();
         widthText.setText("" + this.Width);
         reset();
+        secondMapReset();
     }
 
     public void setJungleProportion() {
         reset();
+        secondMapReset();
         this.JungleProportion = (float) jungleSlider.getValue();
         jungleText.setText("" + this.JungleProportion);
         isChange = true;
@@ -269,6 +293,7 @@ public class ControllerWithMap {
 
     public void setStartEnergy() {
         reset();
+        secondMapReset();
         this.StartEnergy = (int) startEnergySlider.getValue();
         startEnergyText.setText("" + this.StartEnergy);
         isChange = true;
@@ -290,12 +315,16 @@ public class ControllerWithMap {
         int proportionToSlider = (int) Math.ceil(animalsSlider.getMax() / (this.newMap.getHeight() * newMap.getWidth() * this.JungleProportion));
         this.AnimalNumber = (int) animalsSlider.getValue() / proportionToSlider;
         reset();
+        secondMapReset();
+
         animalNumberText.setText("" + this.newMap.getNumberOfAnimals());
         isChange = true;
     }
 
     public void setGrassNumber() {
         reset();
+        secondMapReset();
+
         this.GrassNumber = (int) grassSlider.getValue();
         grassNumberText.setText("" + newMap.Grasses.size());
         isChange = true;
@@ -446,6 +475,7 @@ public class ControllerWithMap {
     {
         isSecondMapOnScreen = true;
         stop();
+        secondMapReset();
         this.world.getChildren().clear();
         world.setPrefHeight(368);
         world.setMaxHeight(368);
@@ -461,6 +491,7 @@ public class ControllerWithMap {
     public void hideSecondMap()
     {
         isSecondMapOnScreen = false;
+        secondMapReset();
         stop();
         this.world.getChildren().clear();
         secondWorld.setPrefHeight(0);
@@ -494,6 +525,41 @@ public class ControllerWithMap {
             newMap.unsetAllAsPopularAnimal();
         }
         newMap.draw();
+    }
+    @FXML
+    public void secondMapStep() {
+        if (isChange) {
+            isChange = false;
+            secMap.changeParameters(DayEnergy, GrassEnergy);
+        }
+        secMap.oneDayPass();
+        secMap.draw();
+    }
+    @FXML
+    public void secondMapStart() {
+        if (isFirstTime)
+        {
+            secondMapReset();
+            isFirstTime=false;
+        }
+        secondMapClock.start();
+    }
+
+    @FXML
+    public void secondMapStop() {
+        secondMapClock.stop();
+    }
+    @FXML
+    public void secondMapReset() {
+        secondMapStop();
+        secondWorld.getChildren().clear();
+        secMap = new Map(secondWorld, Height, Width, JungleProportion, JungleProportion, GrassNumber, AnimalNumber, StartEnergy, GrassEnergy, DayEnergy, SecondMapObserver);
+        secMap.draw();
+    }
+    @FXML
+    public void saveStatsToTxt() throws FileNotFoundException {
+        StatsToTxtSaver saver = new StatsToTxtSaver();
+        saver.saveStats(newMap);
     }
 }
 

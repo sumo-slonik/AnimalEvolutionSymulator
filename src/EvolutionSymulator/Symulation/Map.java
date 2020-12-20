@@ -142,9 +142,10 @@ public class Map {
     public void spawnGrass(int numberOfGrass, Vector2d leftBottomCorner, Vector2d rightTopCorner) {
         int i = 0;
         int counter =0;
-        while (i < numberOfGrass && counter < 50) {
+        while (i < numberOfGrass && counter < 100) {
             if (placeGrass(leftBottomCorner, rightTopCorner)) {
                 i++;
+                counter=0;
             }else {
                 counter++;
             }

@@ -330,6 +330,12 @@
                   </HBox>
                   <CheckBox fx:id="secondMap" mnemonicParsing="false" onAction="#secondMap" text="Druga niezależna mapa" />
                   <CheckBox fx:id="colorMostPopularDNA" mnemonicParsing="false" onAction="#ColorPopularDNA" prefHeight="70.0" prefWidth="192.0" text="Zaznacz popularny genom" />
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zapisz Statystyki dnia do pliku" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveStatsToTxt" text="Zapisz" />
+                     </children>
+                  </VBox>
                </children>
             </VBox>
          </children>
@@ -342,21 +348,14 @@
                <children>
                   <VBox maxHeight="-Infinity" prefHeight="0.0" prefWidth="100.0">
                      <children>
-                        <HBox alignment="CENTER" prefHeight="0.0" prefWidth="200.0">
-                           <children>
-                              <Button alignment="CENTER" maxHeight="0.0" maxWidth="0.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="0.0" />
-                              <Button alignment="CENTER" maxHeight="0.0" maxWidth="0.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="0.0" />
-                              <Button alignment="CENTER" maxHeight="0.0" maxWidth="0.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="0.0" />
-                           </children>
-                        </HBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <Pane fx:id="secondWorld" prefHeight="0.0" prefWidth="600.0" />
-                              <HBox prefHeight="100.0" prefWidth="200.0">
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="secondStart" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="0.0" prefWidth="45.0" text="Start" />
-                                    <Button fx:id="secondStop" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="0.0" prefWidth="45.0" text="Stop" />
-                                    <Button fx:id="secondReset" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="0.0" prefWidth="45.0" text="Reset" />
+                                    <Button fx:id="secondStart" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#secondMapStart" prefHeight="0.0" prefWidth="45.0" text="Start" />
+                                    <Button fx:id="secondStop" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#secondMapStop" prefHeight="0.0" prefWidth="45.0" text="Stop" />
+                                    <Button fx:id="secondReset" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#secondMapReset" prefHeight="0.0" prefWidth="45.0" text="Reset" />
                                  </children>
                               </HBox>
                            </children>
