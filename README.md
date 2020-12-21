@@ -33,9 +33,9 @@ Symulator umożliwia:
 - Pozwala na podświetlenie osobników z najpopularniejszym genomem
 - Po wybraniu śledzonego osobnika podświetla również jego dzieci i potomków
 
-Link do wizualizacji z działania programu: https://youtu.be/Lw1ZQzhyKZQ
+<h5>Link do wizualizacji z działania programu:<h5> https://youtu.be/Lw1ZQzhyKZQ
 
-Uruchomienie projektu<br>
+<h3>Uruchomienie projektu<br><h3>
 - Do uruchomienia projektu niezbędna jest biblioteka java fx
 - ponaddto w pliku GUI.fxml należy podmienić ścieżki plików jpg z "file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images" na "file:[ŚCIEŻKA BEZWZGLĘDNA PROJEKTU]/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images"
 
