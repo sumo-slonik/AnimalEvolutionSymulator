@@ -33,5 +33,5 @@ Symulator umożliwia:
 - Pozwala na podświetlenie osobników z najpopularniejszym genomem
 - Po wybraniu śledzonego osobnika podświetla również jego dzieci i potomków
 
-Link do wizualizacji z działania programu: https://studio.youtube.com/video/Lw1ZQzhyKZQ/edit
+Link do wizualizacji z działania programu: https://youtu.be/Lw1ZQzhyKZQ
   
