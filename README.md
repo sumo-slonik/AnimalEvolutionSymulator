@@ -35,8 +35,8 @@ Symulator umożliwia:
 
 <h5>Link do wizualizacji z działania programu:</h5> https://youtu.be/Lw1ZQzhyKZQ
 
-<h3>Uruchomienie projektu<br></h3>
-- Do uruchomienia projektu niezbędna jest biblioteka java fx
-- ponaddto w pliku GUI.fxml należy podmienić ścieżki plików jpg z "file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images" na "file:[ŚCIEŻKA BEZWZGLĘDNA PROJEKTU]/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images"
+<h3>Uruchomienie projektu</h3> <br>
+- Do uruchomienia projektu niezbędna jest biblioteka java fx <br>
+- ponaddto w pliku GUI.fxml należy podmienić ścieżki plików jpg z "file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images" na "file:[ŚCIEŻKA BEZWZGLĘDNA PROJEKTU]/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images" <br>
 
   
