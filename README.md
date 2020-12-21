@@ -34,4 +34,8 @@ Symulator umożliwia:
 - Po wybraniu śledzonego osobnika podświetla również jego dzieci i potomków
 
 Link do wizualizacji z działania programu: https://youtu.be/Lw1ZQzhyKZQ
+
+Uruchomienie projektu
+Do uruchomienia projektu niezbędna jest biblioteka java fx, ponaddto w pliku GUI.fxml należy podmienić ścieżki plików jpg z "file:/D:/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images" na "file:[ŚCIEŻKA BEZWZGLĘDNA PROJEKTU]/AnimalEvolutionSymulator/src/EvolutionSymulator/GUI/Images"
+
   
